@@ -5,13 +5,28 @@ import pandas as pd
 
 # Função para carregar a planilha Excel
 @st.cache_data
-uploaded_file = st.file_uploader("Faça upload do arquivo Excel", type="xlsx")
+import streamlit as st
+import pandas as pd
 
-if uploaded_file:
-    df = pd.read_excel(uploaded_file)
-    st.write(df)
+# Função para carregar o arquivo via upload
+uploaded_file = st.file_uploader("Upload do arquivo Excel", type="xlsx")
+
+if uploaded_file is not None:
+    try:
+        # Carregar o arquivo Excel
+        df = pd.read_excel(uploaded_file)
+        
+        # Exibir os dados carregados
+        st.write(df)
+
+        # Exibir o número de linhas e colunas do arquivo
+        st.success(f"Arquivo carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
+    
+    except Exception as e:
+        st.error(f"Erro ao carregar o arquivo: {e}")
 else:
     st.warning("Nenhum arquivo foi carregado.")
+
 
 
 # Função para filtrar os valores das listas de acordo com a seleção

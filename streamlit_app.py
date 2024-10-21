@@ -1,10 +1,16 @@
+import os
 import streamlit as st
 import pandas as pd
 
-# Função para carregar a planilha Excel
+# Function to load the Excel sheet
 @st.cache_data
 def load_data():
-    return pd.read_excel('NovaBasePRF_2021-2024_Codificados&Dinamica_06_09_outliers.xlsx')
+    file_path = 'NovaBasePRF_2021-2024_Codificados&Dinamica_06_09_outliers.xlsx'
+    if not os.path.isfile(file_path):
+        st.error(f"File not found: {file_path}")
+        return pd.DataFrame()  # Return an empty DataFrame or handle the error appropriately
+    return pd.read_excel(file_path)
+
 
 # Função para filtrar os valores das listas de acordo com a seleção
 def filter_options(df, atividade, operacao, etapa):

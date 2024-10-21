@@ -5,16 +5,14 @@ import pandas as pd
 
 # Função para carregar a planilha Excel
 @st.cache_data
-def load_data():
-    file_path = 'NovaBasePRF_2021-2024_Codificados&Dinamica_06_09_outliers.xlsx'
-    if not os.path.isfile(file_path):
-        st.error(f"Arquivo não encontrado: {file_path}")
-        return pd.DataFrame()  # Retorna um DataFrame vazio ou trata o erro apropriadamente
-    try:
-        return pd.read_excel(file_path)
-    except KeyError as e:
-        st.error(f"Erro ao carregar o arquivo: {e}")
-        return pd.DataFrame()
+uploaded_file = st.file_uploader("Faça upload do arquivo Excel", type="xlsx")
+
+if uploaded_file:
+    df = pd.read_excel(uploaded_file)
+    st.write(df)
+else:
+    st.warning("Nenhum arquivo foi carregado.")
+
 
 # Função para filtrar os valores das listas de acordo com a seleção
 def filter_options(df, atividade, operacao, etapa):

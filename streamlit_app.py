@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 
+
 # Função para carregar a planilha Excel
 @st.cache_data
 def load_data():

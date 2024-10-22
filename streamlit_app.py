@@ -97,13 +97,15 @@ if uploaded_file is not None:
             
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
-            
-            # Criar coluna "Excluir" e adicionar checkbox em cada linha
+
+            # Exibir a tabela filtrada
             if not df_filtrado.empty:
-                df_filtrado['Excluir'] = [st.checkbox("", key=f"excluir_{row}_{idx}") for idx in df_filtrado.index]
-                # Exibir o DataFrame formatado
-                st.dataframe(df_filtrado.drop(columns=["Excluir"]))  # Remover a coluna de exclusão ao exibir o dataframe
-                
+                st.write('Amostragem dos dados correspondentes (sem outliers):')
+                st.dataframe(df_filtrado)
+        
+        # Botão para adicionar nova linha
+        st.button("Adicionar nova linha", on_click=add_new_row)
+    
     except Exception as e:
         st.error(f"Erro ao carregar o arquivo: {e}")
 else:

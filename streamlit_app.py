@@ -45,7 +45,12 @@ if uploaded_file is not None:
 
         # Renderizar múltiplas linhas de formulários
         for row in range(st.session_state.num_rows):
-            st.write(f"**Linha {row + 1}**")
+            # Criar faixa azul para destacar o número da linha
+            st.markdown(f"""
+                <div style='background-color: #007BFF; padding: 10px; margin-bottom: 10px;'>
+                    <h4 style='color: white; text-align: center;'>Linha {row + 1}</h4>
+                </div>
+            """, unsafe_allow_html=True)
 
             # Primeira linha de campos: ATIVIDADE, OPERACAO, ETAPA, FASE
             col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção

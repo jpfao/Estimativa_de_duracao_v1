@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
 
-# Função para filtrar os valores das listas de acordo com a seleção
+# Função para filtrar os valores das listas de acordo com a seleção e remover outliers
 def filter_options(df, atividade, operacao, etapa):
-    df_filtered = df[(df['ATIVIDADE'] == atividade) &
+    # Remover as linhas onde a coluna 'Outlier' seja "VERDADEIRO"
+    df_filtered = df[(df['Outlier'] != 'VERDADEIRO') &
+                     (df['ATIVIDADE'] == atividade) &
                      (df['OPERACAO'] == operacao) &
                      (df['ETAPA'] == etapa)]
     return df_filtered
@@ -61,9 +63,9 @@ if uploaded_file is not None:
             with col5:
                 extensao = st.number_input(f'EXTENSÃO (linha {row + 1}):', min_value=0.0, key=f'extensao_{row}')
             
-            # Filtrando dados para cada linha
+            # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade, operacao, etapa)
-            st.write('Amostragem dos dados correspondentes:')
+            st.write('Amostragem dos dados correspondentes (sem outliers):')
             st.write(df_filtrado)
         
         # Botão para adicionar nova linha

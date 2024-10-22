@@ -55,8 +55,8 @@ if uploaded_file is not None:
         for row in range(st.session_state.num_rows):
             # Criar faixa de separação para cada linha
             st.markdown(f"""
-                <div style='background-color: #F0F2F6; padding: 1px; margin-bottom: 10px;'>
-                    <h4 style='color: black; text-align: left; margin: 5; font-size: 110%;'>Linha {row + 1}</h4>
+                <div style='background-color: #008542; padding: 1px; margin-bottom: 10px;'>
+                    <h4 style='color: white; text-align: center; margin: 5; font-size: 110%;'>Linha {row + 1}</h4>
                 </div>
             """, unsafe_allow_html=True)
 

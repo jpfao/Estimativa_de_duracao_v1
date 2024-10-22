@@ -56,7 +56,7 @@ if uploaded_file is not None:
             # Criar faixa de separação para cada linha
             st.markdown(f"""
                 <div style='background-color: #008542; padding: 1px; margin-bottom: 10px;'>
-                    <h4 style='color: white; text-align: center; margin: 5; font-size: 110%;'>Linha {row + 1}</h4>
+                    <h4 style='color: white; text-align: center; margin: 5; font-size: 130%;'>Linha {row + 1}</h4>
                 </div>
             """, unsafe_allow_html=True)
 

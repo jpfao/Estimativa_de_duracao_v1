@@ -108,7 +108,7 @@ if uploaded_file is not None:
 
             # Exibir a tabela filtrada
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
-            st.write(df_filtrado)
+            st.dataframe(df_filtrado)  # Usar st.dataframe para manter as checkboxes interativas dentro da tabela
 
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)

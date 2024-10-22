@@ -45,7 +45,7 @@ if uploaded_file is not None:
 
         # Renderizar múltiplas linhas de formulários
         for row in range(st.session_state.num_rows):
-            # Criar faixa amarela com menor espessura e texto ajustado
+            # Criar faixa de separação para cada linha
             st.markdown(f"""
                 <div style='background-color: #F0F2F6; padding: 1px; margin-bottom: 10px;'>
                     <h4 style='color: black; text-align: left; margin: 5; font-size: 110%;'>Linha {row + 1}</h4>
@@ -97,24 +97,11 @@ if uploaded_file is not None:
             
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
-
-            # Exibir a tabela com as caixas de seleção diretamente nas linhas
-            st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
-
             if not df_filtrado.empty:
-                df_filtrado.reset_index(drop=True, inplace=True)
-                df_filtrado.insert(0, 'Excluir', False)
-                
-                # Adicionando checkboxes
-                checkboxes = []
-                for i in df_filtrado.index:
-                    excluir = st.checkbox(f'', key=f'excluir_{i}')
-                    checkboxes.append(excluir)
-                    df_filtrado.at[i, 'Excluir'] = excluir
-
-                # Exibir a tabela com checkboxes
-                st.dataframe(df_filtrado)
-
+                # Adicionar uma coluna de exclusão e exibir o dataframe filtrado
+                df_filtrado['Excluir'] = df_filtrado.apply(lambda row: st.checkbox('Excluir', key=f"excluir_{row.name}_{row.POCO}"), axis=1)
+                st.write(df_filtrado)
+        
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)
     

@@ -110,6 +110,9 @@ if uploaded_file is not None:
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
 
+            # Exibir o número de amostras filtradas
+            st.info(f'Número de amostras filtradas: {df_filtrado.shape[0]}')
+
             # Exibir a tabela filtrada
             if not df_filtrado.empty:
                 st.write('Amostragem dos dados correspondentes (sem outliers):')

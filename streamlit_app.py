@@ -48,7 +48,7 @@ if uploaded_file is not None:
             # Criar faixa amarela com menor espessura e texto ajustado
             st.markdown(f"""
                 <div style='background-color: #FFD700; padding: 0.5px; margin-bottom: 20px;'>
-                    <h4 style='color: black; text-align: left; margin: 4; font-size: 110%;'>Linha {row + 1}</h4>
+                    <h4 style='color: black; text-align: left; margin: 2; font-size: 110%;'>Linha {row + 1}</h4>
                 </div>
             """, unsafe_allow_html=True)
 

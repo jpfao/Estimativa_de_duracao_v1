@@ -102,8 +102,9 @@ if uploaded_file is not None:
             # Exibir a tabela com as caixas de seleção diretamente nas linhas
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
 
+            # Renderizando a tabela com checkboxes dentro
             for i in df_filtrado.index:
-                cols = st.columns(len(df_filtrado.columns) + 1)
+                cols = st.columns([0.2, 1, 1, 1, 1, 1, 1, 1, 1])  # Ajuste de colunas para dar espaço à checkbox
                 with cols[0]:
                     excluir = st.checkbox('Excluir', key=f"excluir_{i}")
                 for j, col_name in enumerate(df_filtrado.columns):

@@ -47,10 +47,11 @@ if uploaded_file is not None:
         for row in range(st.session_state.num_rows):
             # Criar faixa amarela com menor espessura e texto ajustado
             st.markdown(f"""
-                <div style='background-color: #006298; padding: -10px; margin-bottom: 20px;'>
-                    <h4 style='color: white; text-align: left; margin: 2; font-size: 110%;'>Linha {row + 1}</h4>
+                <div style='background-color: #006298; padding: 5px; margin-bottom: 10px;'>
+                    <h4 style='color: white; text-align: left; margin: 5; font-size: 110%;'>Linha {row + 1}</h4>
                 </div>
             """, unsafe_allow_html=True)
+
 
             # Primeira linha de campos: ATIVIDADE, OPERACAO, ETAPA, FASE
             col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção

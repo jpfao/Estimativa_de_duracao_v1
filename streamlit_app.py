@@ -4,7 +4,7 @@ import pandas as pd
 # Função para filtrar os valores das listas de acordo com a seleção e remover outliers
 def filter_options(df, atividade, operacao, etapa):
     # Remover as linhas onde a coluna 'Outlier' seja "VERDADEIRO"
-    df_filtered = df[(df['Outlier'] != 'VERDADEIRO') &
+    df_filtered = df[(df['Outlier'] == False) &
                      (df['ATIVIDADE'] == atividade) &
                      (df['OPERACAO'] == operacao) &
                      (df['ETAPA'] == etapa)]

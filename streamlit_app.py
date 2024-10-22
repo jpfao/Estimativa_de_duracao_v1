@@ -52,6 +52,7 @@ if uploaded_file is not None:
                 </div>
             """, unsafe_allow_html=True)
 
+
             # Primeira linha de campos: ATIVIDADE, OPERACAO, ETAPA, FASE
             col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção
             
@@ -98,17 +99,15 @@ if uploaded_file is not None:
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
 
-            # Adicionar a coluna "Excluir" antes de renderizar a tabela, apenas se não existir ainda
-            if 'Excluir' not in df_filtrado.columns:
-                df_filtrado.insert(0, 'Excluir', False)  # Adicionar coluna "Excluir" com valores iniciais False
-
-            # Exibir a tabela com a coluna "Excluir"
-            for i in df_filtrado.index:
-                df_filtrado.at[i, 'Excluir'] = st.checkbox('', key=f"excluir_{i}_{row}")
-
-            # Exibir a tabela filtrada
+            # Exibir a tabela com as caixas de seleção diretamente nas linhas
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
-            st.dataframe(df_filtrado)  # Usar st.dataframe para manter as checkboxes interativas dentro da tabela
+
+            for i in df_filtrado.index:
+                cols = st.columns(len(df_filtrado.columns) + 1)
+                with cols[0]:
+                    excluir = st.checkbox('Excluir', key=f"excluir_{i}")
+                for j, col_name in enumerate(df_filtrado.columns):
+                    cols[j + 1].write(df_filtrado.at[i, col_name])
 
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)

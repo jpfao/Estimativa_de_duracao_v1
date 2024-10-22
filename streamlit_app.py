@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 
 # Função para filtrar as opções e remover outliers
-def filter_options(df, atividade=None, operacao=None, etapa=None):
-    df_filtered = df[df['Outlier'] == False]  # Remover "VERDADEIRO" (Outliers)
+def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None):
+    df_filtered = df[df['Outlier'] == False]  # Remover outliers
     
     if atividade:
         df_filtered = df_filtered[df_filtered['ATIVIDADE'] == atividade]
@@ -11,6 +11,8 @@ def filter_options(df, atividade=None, operacao=None, etapa=None):
         df_filtered = df_filtered[df_filtered['OPERACAO'] == operacao]
     if etapa:
         df_filtered = df_filtered[df_filtered['ETAPA'] == etapa]
+    if fase:
+        df_filtered = df_filtered[df_filtered['FASE'] == fase]
     
     return df_filtered
 
@@ -45,7 +47,7 @@ if uploaded_file is not None:
         for row in range(st.session_state.num_rows):
             st.write(f"**Linha {row + 1}**")
 
-            # Criar colunas ajustando a largura dos campos
+            # Primeira linha de campos: ATIVIDADE, OPERACAO, ETAPA, FASE
             col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção
             
             # Seleção da ATIVIDADE
@@ -73,8 +75,24 @@ if uploaded_file is not None:
             with col4:
                 fase = st.selectbox(f'FASE (linha {row + 1}):', df_filtered_etapa['FASE'].unique(), key=f'fase_{row}')
             
+            # Segunda linha de campos: DIÂMETRO BROCA, DIÂMETRO REVESTIMENTO, TIPO AVANÇO, TIPO SONDA
+            col5, col6, col7, col8 = st.columns([2, 2, 2, 2])
+            
+            # Filtrar opções com base na seleção anterior (inclusive FASE)
+            df_filtered_fase = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
+
+            # Seleção dos novos campos de acordo com as colunas correspondentes
+            with col5:
+                diametro_broca = st.selectbox(f'DIÂMETRO BROCA (linha {row + 1}):', df_filtered_fase['Diâmetro Broca'].unique(), key=f'diametro_broca_{row}')
+            with col6:
+                diametro_revestimento = st.selectbox(f'DIÂMETRO REVESTIMENTO (linha {row + 1}):', df_filtered_fase['Diâmetro Revestimento'].unique(), key=f'diametro_revestimento_{row}')
+            with col7:
+                tipo_avanco = st.selectbox(f'TIPO AVANÇO (linha {row + 1}):', df_filtered_fase['Tipo Avanço'].unique(), key=f'tipo_avanco_{row}')
+            with col8:
+                tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo Sonda'].unique(), key=f'tipo_sonda_{row}')
+            
             # Filtrando dados para cada linha e removendo outliers
-            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa)
+            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
             st.write('Amostragem dos dados correspondentes (sem outliers):')
             st.write(df_filtrado)
         

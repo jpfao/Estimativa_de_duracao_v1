@@ -88,7 +88,7 @@ if uploaded_file is not None:
             with col7:
                 tipo_avanco = st.selectbox(f'TIPO AVANÇO (linha {row + 1}):', df_filtered_fase['Tipo_avanço'].unique(), key=f'tipo_avanco_{row}')
             with col8:
-                tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo Sonda'].unique(), key=f'tipo_sonda_{row}')
+                tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo_sonda'].unique(), key=f'tipo_sonda_{row}')
             
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)

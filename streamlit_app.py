@@ -52,7 +52,6 @@ if uploaded_file is not None:
                 </div>
             """, unsafe_allow_html=True)
 
-
             # Primeira linha de campos: ATIVIDADE, OPERACAO, ETAPA, FASE
             col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção
             
@@ -96,9 +95,12 @@ if uploaded_file is not None:
             with col8:
                 tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo_sonda'].unique(), key=f'tipo_sonda_{row}')
             
+            # Filtrando dados para cada linha e removendo outliers
+            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
+            
             # Adicionar uma coluna de checkboxes ao lado das linhas
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
-            df_filtrado['Excluir'] = df_filtrado.apply(lambda x: st.checkbox(f"Excluir", key=f"excluir_{x.name}_{row}"), axis=1)
+            df_filtrado['Excluir'] = df_filtrado.apply(lambda x: st.checkbox(f"Excluir linha {x.name}", key=f"excluir_{x.name}_{row}"), axis=1)
 
             # Exibir a tabela com checkboxes para exclusão
             st.write(df_filtrado)
@@ -110,3 +112,4 @@ if uploaded_file is not None:
         st.error(f"Erro ao carregar o arquivo: {e}")
 else:
     st.warning("Nenhum arquivo foi carregado.")
+

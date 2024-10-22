@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Função para filtrar as opções e remover outliers
-def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None):
+def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None):
     df_filtered = df[df['Outlier'] == False]  # Remover outliers
     
     if atividade:
@@ -13,6 +13,8 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None):
         df_filtered = df_filtered[df_filtered['ETAPA'] == etapa]
     if fase:
         df_filtered = df_filtered[df_filtered['FASE'] == fase]
+    if obz:
+        df_filtered = df_filtered[df_filtered['Obz'] == obz]
     
     return df_filtered
 
@@ -80,7 +82,7 @@ if uploaded_file is not None:
             with col4:
                 fase = st.selectbox(f'FASE (linha {row + 1}):', df_filtered_etapa['FASE'].unique(), key=f'fase_{row}')
             
-            # Segunda linha de campos: DIÂMETRO BROCA, DIÂMETRO REVESTIMENTO, TIPO AVANÇO, TIPO SONDA
+            # Segunda linha de campos: DIÂMETRO BROCA, DIÂMETRO REVESTIMENTO, OBZ, TIPO SONDA
             col5, col6, col7, col8 = st.columns([2, 2, 2, 2])
             
             # Filtrar opções com base na seleção anterior (inclusive FASE)
@@ -91,12 +93,12 @@ if uploaded_file is not None:
             with col6:
                 diametro_revestimento = st.selectbox(f'DIÂMETRO REVESTIMENTO (linha {row + 1}):', df_filtered_fase['Diâmetro Revestimento'].unique(), key=f'diametro_revestimento_{row}')
             with col7:
-                tipo_avanco = st.selectbox(f'TIPO AVANÇO (linha {row + 1}):', df_filtered_fase['Tipo_avanço'].unique(), key=f'tipo_avanco_{row}')
+                obz = st.selectbox(f'OBZ (linha {row + 1}):', df_filtered_fase['Obz'].unique(), key=f'obz_{row}')
             with col8:
                 tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo_sonda'].unique(), key=f'tipo_sonda_{row}')
             
             # Filtrando dados para cada linha e removendo outliers
-            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
+            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz)
 
             # Exibir a tabela filtrada
             if not df_filtrado.empty:

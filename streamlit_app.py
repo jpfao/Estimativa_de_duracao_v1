@@ -15,6 +15,9 @@ def add_new_row():
     else:
         st.session_state.num_rows += 1
 
+# Definir a largura da página como ampla
+st.set_page_config(layout="wide")
+
 # Upload do arquivo Excel
 uploaded_file = st.file_uploader("Upload do arquivo Excel", type="xlsx")
 
@@ -43,14 +46,19 @@ if uploaded_file is not None:
         # Renderizar múltiplas linhas de formulários
         for row in range(st.session_state.num_rows):
             st.write(f"**Linha {row + 1}**")
-            col1, col2, col3, col4, col5 = st.columns(5)
+            
+            # Criar colunas ajustando a largura dos campos
+            col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])  # Largura ajustada para os campos de seleção
             
             with col1:
-                atividade = st.selectbox(f'ATIVIDADE (linha {row + 1}):', atividades, key=f'atividade_{row}')
+                atividade = st.selectbox(f'ATIVIDADE (linha {row + 1}):', atividades, key=f'atividade_{row}', 
+                                         label_visibility="visible", use_container_width=True)
             with col2:
-                operacao = st.selectbox(f'OPERACAO (linha {row + 1}):', operacoes, key=f'operacao_{row}')
+                operacao = st.selectbox(f'OPERACAO (linha {row + 1}):', operacoes, key=f'operacao_{row}', 
+                                        label_visibility="visible", use_container_width=True)
             with col3:
-                etapa = st.selectbox(f'ETAPA (linha {row + 1}):', etapas, key=f'etapa_{row}')
+                etapa = st.selectbox(f'ETAPA (linha {row + 1}):', etapas, key=f'etapa_{row}', 
+                                     label_visibility="visible", use_container_width=True)
             with col4:
                 fase = st.number_input(f'FASE (linha {row + 1}):', min_value=0, max_value=100, key=f'fase_{row}')
             with col5:

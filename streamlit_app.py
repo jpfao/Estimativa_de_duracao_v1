@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Função para filtrar as opções e remover outliers
-def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None):
+def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None, broca=None, revestimento=None, tipo_sonda=None):
     df_filtered = df[df['Outlier'] == False]  # Remover outliers
     
     if atividade:
@@ -15,6 +15,12 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
         df_filtered = df_filtered[df_filtered['FASE'] == fase]
     if obz:
         df_filtered = df_filtered[df_filtered['Obz'] == obz]
+    if broca and 'Todos' not in broca:
+        df_filtered = df_filtered[df_filtered['Diâmetro Broca'].isin(broca)]
+    if revestimento and 'Todos' not in revestimento:
+        df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].isin(revestimento)]
+    if tipo_sonda and 'Todos' not in tipo_sonda:
+        df_filtered = df_filtered[df_filtered['Tipo_sonda'].isin(tipo_sonda)]
     
     return df_filtered
 
@@ -85,20 +91,24 @@ if uploaded_file is not None:
             # Segunda linha de campos: DIÂMETRO BROCA, DIÂMETRO REVESTIMENTO, OBZ, TIPO SONDA
             col5, col6, col7, col8 = st.columns([2, 2, 2, 2])
             
-            # Filtrar opções com base na seleção anterior (inclusive FASE)
-            df_filtered_fase = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
-
+            # Seleção de DIÂMETRO BROCA com múltipla escolha
             with col5:
-                diametro_broca = st.selectbox(f'DIÂMETRO BROCA (linha {row + 1}):', df_filtered_fase['Diâmetro Broca'].unique(), key=f'diametro_broca_{row}')
+                broca = st.multiselect(f'DIÂMETRO BROCA (linha {row + 1}):', ['Todos'] + list(df_filtered_etapa['Diâmetro Broca'].unique()), default='Todos', key=f'broca_{row}')
+            
+            # Seleção de DIÂMETRO REVESTIMENTO com múltipla escolha
             with col6:
-                diametro_revestimento = st.selectbox(f'DIÂMETRO REVESTIMENTO (linha {row + 1}):', df_filtered_fase['Diâmetro Revestimento'].unique(), key=f'diametro_revestimento_{row}')
+                revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (linha {row + 1}):', ['Todos'] + list(df_filtered_etapa['Diâmetro Revestimento'].unique()), default='Todos', key=f'revestimento_{row}')
+            
+            # Seleção de OBZ
             with col7:
-                obz = st.selectbox(f'OBZ (linha {row + 1}):', df_filtered_fase['Obz'].unique(), key=f'obz_{row}')
+                obz = st.selectbox(f'OBZ (linha {row + 1}):', df_filtered_etapa['Obz'].unique(), key=f'obz_{row}')
+            
+            # Seleção de TIPO SONDA com múltipla escolha
             with col8:
-                tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo_sonda'].unique(), key=f'tipo_sonda_{row}')
+                tipo_sonda = st.multiselect(f'TIPO SONDA (linha {row + 1}):', ['Todos'] + list(df_filtered_etapa['Tipo_sonda'].unique()), default='Todos', key=f'tipo_sonda_{row}')
             
             # Filtrando dados para cada linha e removendo outliers
-            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz)
+            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
 
             # Exibir a tabela filtrada
             if not df_filtrado.empty:

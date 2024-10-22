@@ -47,7 +47,7 @@ if uploaded_file is not None:
         for row in range(st.session_state.num_rows):
             # Criar faixa amarela com menor espessura e texto ajustado
             st.markdown(f"""
-                <div style='background-color: #FFD700; padding: 2px; margin-bottom: 8px;'>
+                <div style='background-color: #FFD700; padding: 2px; margin-bottom: 20px;'>
                     <h4 style='color: black; text-align: left; margin: 0; font-size: 110%;'>Linha {row + 1}</h4>
                 </div>
             """, unsafe_allow_html=True)

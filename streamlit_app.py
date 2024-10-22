@@ -102,13 +102,14 @@ if uploaded_file is not None:
             # Exibir a tabela com as caixas de seleção diretamente nas linhas
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
 
-            # Renderizando a tabela com checkboxes dentro
-            for i in df_filtrado.index:
-                cols = st.columns([0.2, 1, 1, 1, 1, 1, 1, 1, 1])  # Ajuste de colunas para dar espaço à checkbox
-                with cols[0]:
-                    excluir = st.checkbox('Excluir', key=f"excluir_{i}")
-                for j, col_name in enumerate(df_filtrado.columns):
-                    cols[j + 1].write(df_filtrado.at[i, col_name])
+            # Ajuste para mostrar apenas as colunas existentes e evitar erro de índice
+            if not df_filtrado.empty:
+                for i in df_filtrado.index:
+                    cols = st.columns([0.2] + [1 for _ in df_filtrado.columns])  # Adicionando espaço para checkbox
+                    with cols[0]:
+                        excluir = st.checkbox('Excluir', key=f"excluir_{i}")
+                    for j, col_name in enumerate(df_filtrado.columns):
+                        cols[j + 1].write(df_filtrado.at[i, col_name])
 
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)

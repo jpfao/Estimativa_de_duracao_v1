@@ -81,13 +81,12 @@ if uploaded_file is not None:
             # Filtrar opções com base na seleção anterior (inclusive FASE)
             df_filtered_fase = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
 
-            # Seleção dos novos campos de acordo com as colunas correspondentes
             with col5:
                 diametro_broca = st.selectbox(f'DIÂMETRO BROCA (linha {row + 1}):', df_filtered_fase['Diâmetro Broca'].unique(), key=f'diametro_broca_{row}')
             with col6:
                 diametro_revestimento = st.selectbox(f'DIÂMETRO REVESTIMENTO (linha {row + 1}):', df_filtered_fase['Diâmetro Revestimento'].unique(), key=f'diametro_revestimento_{row}')
             with col7:
-                tipo_avanco = st.selectbox(f'TIPO AVANÇO (linha {row + 1}):', df_filtered_fase['Tipo Avanço'].unique(), key=f'tipo_avanco_{row}')
+                tipo_avanco = st.selectbox(f'TIPO AVANÇO (linha {row + 1}):', df_filtered_fase['Tipo_avanço'].unique(), key=f'tipo_avanco_{row}')
             with col8:
                 tipo_sonda = st.selectbox(f'TIPO SONDA (linha {row + 1}):', df_filtered_fase['Tipo Sonda'].unique(), key=f'tipo_sonda_{row}')
             

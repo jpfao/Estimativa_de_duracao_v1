@@ -23,6 +23,11 @@ def add_new_row():
     else:
         st.session_state.num_rows += 1
 
+# Função para remover linhas selecionadas
+def remove_selected_rows(df, selected_indices):
+    df_filtered = df.drop(index=selected_indices)
+    return df_filtered
+
 # Definir a largura da página como ampla
 st.set_page_config(layout="wide")
 
@@ -98,9 +103,14 @@ if uploaded_file is not None:
             
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
-            st.write('Amostragem dos dados correspondentes (sem outliers):')
+            st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
+            
+            # Adicionar uma coluna para excluir linhas
+            df_filtrado['Excluir'] = st.checkbox(f'Excluir Linha {row + 1}', key=f'excluir_{row}')
+            
+            # Exibir os dados filtrados
             st.write(df_filtrado)
-        
+
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)
     

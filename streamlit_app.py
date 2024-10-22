@@ -45,10 +45,10 @@ if uploaded_file is not None:
 
         # Renderizar múltiplas linhas de formulários
         for row in range(st.session_state.num_rows):
-            # Criar faixa amarela com menor espessura e texto alinhado à esquerda
+            # Criar faixa amarela com menor espessura e texto ajustado
             st.markdown(f"""
-                <div style='background-color: #FFD700; padding: 5px; margin-bottom: 10px;'>
-                    <h4 style='color: black; text-align: left; margin: 0;'>Linha {row + 1}</h4>
+                <div style='background-color: #FFD700; padding: 2.5px; margin-bottom: 10px;'>
+                    <h4 style='color: black; text-align: left; margin: 0; font-size: 70%;'>Linha {row + 1}</h4>
                 </div>
             """, unsafe_allow_html=True)
 

@@ -52,6 +52,7 @@ if uploaded_file is not None:
                 </div>
             """, unsafe_allow_html=True)
 
+
             # Primeira linha de campos: ATIVIDADE, OPERACAO, ETAPA, FASE
             col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção
             
@@ -101,13 +102,12 @@ if uploaded_file is not None:
             # Adicionar uma checkbox para cada linha ao lado da coluna 'UO'
             df_filtrado['Excluir'] = [st.checkbox(f'', key=f'excluir_{row}_{i}') for i in df_filtrado.index]
 
-            # Remover as linhas selecionadas
-            df_filtrado = df_filtrado[df_filtrado['Excluir'] == False]
-
             # Exibir a amostragem de dados com a coluna de exclusão
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')
-            st.write(df_filtrado.drop(columns=['Excluir']))
 
+            # Criar tabela com as checkboxes e a coluna UO
+            st.write(df_filtrado.drop(columns=['Excluir']))
+        
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)
     
@@ -115,4 +115,5 @@ if uploaded_file is not None:
         st.error(f"Erro ao carregar o arquivo: {e}")
 else:
     st.warning("Nenhum arquivo foi carregado.")
+
 

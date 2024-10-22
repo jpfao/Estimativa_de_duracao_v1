@@ -1,13 +1,17 @@
 import streamlit as st
 import pandas as pd
 
-# Função para filtrar os valores das listas de acordo com a seleção e remover outliers
-def filter_options(df, atividade, operacao, etapa):
-    # Remover as linhas onde a coluna 'Outlier' seja "VERDADEIRO"
-    df_filtered = df[(df['Outlier'] == False) &
-                     (df['ATIVIDADE'] == atividade) &
-                     (df['OPERACAO'] == operacao) &
-                     (df['ETAPA'] == etapa)]
+# Função para filtrar as opções e remover outliers
+def filter_options(df, atividade=None, operacao=None, etapa=None):
+    df_filtered = df[df['Outlier'] == False]  # Remover "VERDADEIRO" (Outliers)
+    
+    if atividade:
+        df_filtered = df_filtered[df_filtered['ATIVIDADE'] == atividade]
+    if operacao:
+        df_filtered = df_filtered[df_filtered['OPERACAO'] == operacao]
+    if etapa:
+        df_filtered = df_filtered[df_filtered['ETAPA'] == etapa]
+    
     return df_filtered
 
 # Função para adicionar uma nova linha ao formulário
@@ -28,17 +32,9 @@ if uploaded_file is not None:
         # Carregar o arquivo Excel
         df = pd.read_excel(uploaded_file)
         
-        # Exibir os dados carregados
-        st.write(df)
-
         # Exibir o número de linhas e colunas do arquivo
         st.success(f"Arquivo carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
         
-        # Listas de valores únicos para picklists
-        atividades = df['ATIVIDADE'].unique()
-        operacoes = df['OPERACAO'].unique()
-        etapas = df['ETAPA'].unique()
-
         # Inicializar número de linhas, se não estiver no estado
         if 'num_rows' not in st.session_state:
             st.session_state.num_rows = 1
@@ -48,23 +44,37 @@ if uploaded_file is not None:
         # Renderizar múltiplas linhas de formulários
         for row in range(st.session_state.num_rows):
             st.write(f"**Linha {row + 1}**")
-            
+
             # Criar colunas ajustando a largura dos campos
-            col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])  # Largura ajustada para os campos de seleção
+            col1, col2, col3, col4 = st.columns([2, 2, 2, 2])  # Largura ajustada para os campos de seleção
             
+            # Seleção da ATIVIDADE
             with col1:
-                atividade = st.selectbox(f'ATIVIDADE (linha {row + 1}):', atividades, key=f'atividade_{row}')
+                atividade = st.selectbox(f'ATIVIDADE (linha {row + 1}):', df['ATIVIDADE'].unique(), key=f'atividade_{row}')
+            
+            # Filtrar as opções de OPERAÇÃO com base na ATIVIDADE selecionada
+            df_filtered_atividade = filter_options(df, atividade=atividade)
+            
+            # Seleção da OPERAÇÃO
             with col2:
-                operacao = st.selectbox(f'OPERACAO (linha {row + 1}):', operacoes, key=f'operacao_{row}')
+                operacao = st.selectbox(f'OPERACAO (linha {row + 1}):', df_filtered_atividade['OPERACAO'].unique(), key=f'operacao_{row}')
+            
+            # Filtrar as opções de ETAPA com base na ATIVIDADE e OPERAÇÃO selecionadas
+            df_filtered_operacao = filter_options(df, atividade=atividade, operacao=operacao)
+            
+            # Seleção da ETAPA
             with col3:
-                etapa = st.selectbox(f'ETAPA (linha {row + 1}):', etapas, key=f'etapa_{row}')
+                etapa = st.selectbox(f'ETAPA (linha {row + 1}):', df_filtered_operacao['ETAPA'].unique(), key=f'etapa_{row}')
+            
+            # Filtrar as opções de FASE com base na ATIVIDADE, OPERAÇÃO e ETAPA selecionadas
+            df_filtered_etapa = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa)
+            
+            # Seleção da FASE (como picklist)
             with col4:
-                fase = st.number_input(f'FASE (linha {row + 1}):', min_value=0, max_value=100, key=f'fase_{row}')
-            with col5:
-                extensao = st.number_input(f'EXTENSÃO (linha {row + 1}):', min_value=0.0, key=f'extensao_{row}')
+                fase = st.selectbox(f'FASE (linha {row + 1}):', df_filtered_etapa['FASE'].unique(), key=f'fase_{row}')
             
             # Filtrando dados para cada linha e removendo outliers
-            df_filtrado = filter_options(df, atividade, operacao, etapa)
+            df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa)
             st.write('Amostragem dos dados correspondentes (sem outliers):')
             st.write(df_filtrado)
         

@@ -98,12 +98,13 @@ if uploaded_file is not None:
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase)
 
-            # Criar a coluna "Excluir" antes de renderizar a tabela
-            df_filtrado.insert(0, 'Excluir', [False]*len(df_filtrado))  # Adicionar coluna "Excluir" com valores iniciais False
+            # Adicionar a coluna "Excluir" antes de renderizar a tabela, apenas se não existir ainda
+            if 'Excluir' not in df_filtrado.columns:
+                df_filtrado.insert(0, 'Excluir', False)  # Adicionar coluna "Excluir" com valores iniciais False
 
             # Exibir a tabela com a coluna "Excluir"
             for i in df_filtrado.index:
-                df_filtrado.at[i, 'Excluir'] = st.checkbox(f'Excluir linha {i}', key=f"excluir_{i}_{row}")
+                df_filtrado.at[i, 'Excluir'] = st.checkbox('', key=f"excluir_{i}_{row}")
 
             # Exibir a tabela filtrada
             st.write(f'Amostragem dos dados correspondentes (sem outliers) para Linha {row + 1}:')

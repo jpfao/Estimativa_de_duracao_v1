@@ -131,4 +131,6 @@ if uploaded_file is not None:
                     f"</div>",
                     unsafe_allow_html=True
                 )
-                st.dataframe(df_outliers.reset_index(drop=True
+                st.dataframe(df_outliers.reset_index(drop=True))  # Corrigido o fechamento do parêntese
+
+       

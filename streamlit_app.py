@@ -135,6 +135,10 @@ if uploaded_file is not None:
             # Filtrando dados para cada linha e removendo outliers
             df_filtrado = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
 
+            # Reordenar colunas para que 'Outlier' seja a primeira coluna
+            columns_order = ['Outlier'] + [col for col in df_filtrado.columns if col != 'Outlier']
+            df_filtrado = df_filtrado[columns_order]
+
             # Exibir o número de amostras filtradas
             st.info(f'Número de amostras filtradas: {df_filtrado.shape[0]}')
 
@@ -158,12 +162,13 @@ if uploaded_file is not None:
             csv = df_filtrado.to_csv(index=False)
             st.download_button(label="Baixar dados filtrados", data=csv, file_name="dados_filtrados.csv", mime="text/csv")
 
-        # Destacar linhas onde 'Outlier' é True
-        def highlight_outliers(row):
-            return ['background-color: yellow' if val == True else '' for val in row]
+        # Destacar visualmente as linhas onde 'Outlier' é True
+        def highlight_outliers(val):
+            color = 'yellow' if val else ''
+            return f'background-color: {color}'
 
-        st.write("Tabela com destaque nas linhas 'Outlier' = True (em amarelo):")
-        st.dataframe(df.style.apply(highlight_outliers, subset=['Outlier'], axis=1))
+        st.write("Tabela com 'Outlier' como primeira coluna e destaque para valores True (fundo amarelo):")
+        st.dataframe(df.style.applymap(highlight_outliers, subset=['Outlier']))
 
     except Exception as e:
         st.error(f"Erro ao carregar o arquivo: {e}")

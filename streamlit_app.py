@@ -137,4 +137,5 @@ if uploaded_file is not None:
 
         # Exibir cada nova linha adicionada manualmente
         for i, row_num in enumerate(manual_rows, start=1):
-            st.markdown(f"<div style='background-color: #8B008B;
+            st.markdown(
+                f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center

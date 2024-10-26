@@ -294,4 +294,4 @@ if uploaded_file is not None:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
 
 else:
-    st.warning("Nenhum arquivo foi
+    st.warning("Nenhum arquivo foi carregado.")

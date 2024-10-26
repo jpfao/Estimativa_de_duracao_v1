@@ -115,12 +115,13 @@ if uploaded_file is not None:
                 df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
                 df_outliers = df_filtered[df_filtered['Outlier'] == True]
 
-                # Exibir quantidade e tabela de amostras onde 'Outlier' é False com estilo customizado
+                # Exibir quantidade e tabela de amostras onde 'Outlier' é True com estilo customizado e espaçamento uniforme
                 st.markdown(
-                    f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
-                    f"Quantidade de Amostras sem Outliers (Linha {i + 1}): <strong>{df_non_outliers.shape[0]}</strong>"
+                    f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
+                    f"Quantidade de Amostras com Outliers (Linha {i + 1}): <strong>{df_outliers.shape[0]}</strong>"
                     f"</div>",
                     unsafe_allow_html=True
+                    
                 )
                 st.dataframe(df_non_outliers.reset_index(drop=True))
 

@@ -131,12 +131,4 @@ if uploaded_file is not None:
                     f"</div>",
                     unsafe_allow_html=True
                 )
-                st.dataframe(df_outliers.reset_index(drop=True))
-
-        else:
-            st.warning("Por favor, carregue o arquivo de referência para aplicar os filtros por linha.")
-
-    except Exception as e:
-        st.error(f"Erro ao carregar o arquivo: {e}")
-else:
-    st.warning("Nenhum
+                st.dataframe(df_outliers.reset_index(drop=True

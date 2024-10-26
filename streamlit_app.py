@@ -133,4 +133,5 @@ if uploaded_file is not None:
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
 
-   
+    except Exception as e:
+        st.error(f"Ocorreu um

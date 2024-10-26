@@ -94,11 +94,11 @@ if uploaded_file is not None:
         df_outliers = df_filtered[df_filtered['Outlier'] == True]
 
         # Exibir tabela de amostras onde 'Outlier' é False
-        st.write("Tabela - Amostras sem Outliers (Outlier = False):")
+        st.write("Amostras não Outliers")
         st.dataframe(df_non_outliers.reset_index(drop=True))
 
         # Exibir tabela de amostras onde 'Outlier' é True
-        st.write("Tabela - Amostras com Outliers (Outlier = True):")
+        st.write("Amostras outliers")
         st.dataframe(df_outliers.reset_index(drop=True))
 
     except Exception as e:

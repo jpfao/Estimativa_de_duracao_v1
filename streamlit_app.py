@@ -96,7 +96,7 @@ if uploaded_file is not None:
         # Exibir quantidade e tabela de amostras onde 'Outlier' é False com estilo customizado
         st.markdown(
             f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
-            f"Quantidade de Amostras sem Outliers: <strong>{df_non_outliers.shape[0]}</strong>"
+            f"Quantidade de Amostras Válidas: <strong>{df_non_outliers.shape[0]}</strong>"
             f"</div>",
             unsafe_allow_html=True
         )
@@ -105,7 +105,7 @@ if uploaded_file is not None:
         # Exibir quantidade e tabela de amostras onde 'Outlier' é True com estilo customizado e espaçamento uniforme
         st.markdown(
             f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
-            f"Quantidade de Amostras com Outliers: <strong>{df_outliers.shape[0]}</strong>"
+            f"Quantidade de Amostras Outliers: <strong>{df_outliers.shape[0]}</strong>"
             f"</div>",
             unsafe_allow_html=True
         )

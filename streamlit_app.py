@@ -142,14 +142,17 @@ if uploaded_file is not None:
             # Exibir o número de amostras filtradas
             st.info(f'Número de amostras filtradas: {df_filtrado.shape[0]}')
 
-            # Exibir a tabela filtrada
-            if not df_filtrado.empty:
-                st.write('Amostragem dos dados correspondentes (sem outliers):')
-                st.dataframe(df_filtrado)
+            # Exibir coluna 'Outlier' à parte
+            st.write("Coluna 'Outlier':")
+            st.dataframe(df_filtrado[['Outlier']])
+
+            # Exibir a tabela filtrada (sem a coluna 'Outlier')
+            st.write('Tabela de dados (sem a coluna Outlier):')
+            st.dataframe(df_filtrado.drop(columns=['Outlier']))
                 
-                # Gráfico interativo
-                fig = px.histogram(df_filtrado, x='OPERACAO', title='Distribuição das Operações')
-                st.plotly_chart(fig)
+            # Gráfico interativo
+            fig = px.histogram(df_filtrado, x='OPERACAO', title='Distribuição das Operações')
+            st.plotly_chart(fig)
         
         # Botão para adicionar nova linha
         st.button("Adicionar nova linha", on_click=add_new_row)
@@ -161,14 +164,6 @@ if uploaded_file is not None:
         if st.button("Exportar Dados Filtrados"):
             csv = df_filtrado.to_csv(index=False)
             st.download_button(label="Baixar dados filtrados", data=csv, file_name="dados_filtrados.csv", mime="text/csv")
-
-        # Destacar em vermelho as células de 'Outlier' com valor True
-        def highlight_outliers(val):
-            color = 'red' if val else ''
-            return f'background-color: {color}'
-
-        st.write("Tabela com 'Outlier' como primeira coluna e destaque para valores True (fundo vermelho):")
-        st.dataframe(df.style.applymap(highlight_outliers, subset=['Outlier']))
 
     except Exception as e:
         st.error(f"Erro ao carregar o arquivo: {e}")

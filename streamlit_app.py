@@ -48,6 +48,18 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
+# Converte colunas específicas para tipos numéricos e de texto, conforme necessário
+# Substitua 'Nome_da_Coluna_Numérica' e 'Nome_da_Coluna_Texto' pelos nomes reais de suas colunas
+
+# Converte as colunas que devem ser numéricas
+for col in ['Diâmetro Broca', 'Diâmetro Revestimento']:  # Substitua com as colunas apropriadas
+    df[col] = pd.to_numeric(df[col], errors='coerce')  # Converte para numérico, define 'NaN' para valores inválidos
+
+# Converte as colunas que devem ser strings
+for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda']:  # Substitua com as colunas apropriadas
+    df[col] = df[col].astype(str)  # Garante que essas colunas sejam do tipo string
+
+
 # Dicionário para armazenar listas de linhas manuais entre as linhas automáticas
 if 'manual_rows' not in st.session_state:
     st.session_state.manual_rows = {}

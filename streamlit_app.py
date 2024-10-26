@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Função para filtrar as opções e remover outliers com filtros interdependentes
+# Função para filtrar as opções e remover outliers
 @st.cache_data
 def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None, broca=None, revestimento=None, tipo_sonda=None):
     df_filtered = df.copy()  # Trabalhar com cópia para evitar alterações no original
@@ -17,16 +17,19 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     if obz and obz != "TODOS":
         df_filtered = df_filtered[df_filtered['Obz'] == obz]
     if broca and 'TODOS' not in broca:
-        df_filtered = df_filtered[df_filtered['Diâmetro Broca'].isin(broca)]
+        df_filtered = df_filtered[df_filtered['Diâmetro Broca'].apply(lambda x: x in broca if isinstance(x, str) else False)]
     if revestimento and 'TODOS' not in revestimento:
-        df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].isin(revestimento)]
+        df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].apply(lambda x: x in revestimento if isinstance(x, str) else False)]
     if tipo_sonda and 'TODOS' not in tipo_sonda:
-        df_filtered = df_filtered[df_filtered['Tipo_sonda'].isin(tipo_sonda)]
+        df_filtered = df_filtered[df_filtered['Tipo_sonda'].apply(lambda x: x in tipo_sonda if isinstance(x, str) else False)]
     
     return df_filtered
 
 # Definir a largura da página como ampla
 st.set_page_config(layout="wide")
+
+# Resto do código continua como você já tem, garantindo que onde há comparações sejam feitos `apply` para garantir que são do mesmo tipo
+
 
 # Upload do arquivo principal
 uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type="xlsx")
@@ -225,3 +228,5 @@ if uploaded_file is not None:
 
 else:
     st.warning("Nenhum arquivo foi carregado.")
+
+

@@ -28,48 +28,34 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
 # Definir a largura da página como ampla
 st.set_page_config(layout="wide")
 
-# Função para adicionar linha manual abaixo de uma linha específica
-def add_manual_row(below_index):
-    if below_index not in st.session_state.manual_rows:
-        st.session_state.manual_rows[below_index] = []
-    st.session_state.manual_rows[below_index].append(len(st.session_state.manual_rows[below_index]) + 1)
-
-# Função para excluir uma linha manual ou automática
-def delete_row(index, is_manual=False, manual_index=None):
-    if is_manual:
-        st.session_state.manual_rows[index].remove(manual_index)
-        if not st.session_state.manual_rows[index]:
-            del st.session_state.manual_rows[index]
-    else:
-        st.session_state.automatic_rows.remove(index)
-
 # Upload do arquivo principal
 uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type="xlsx")
+
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
-
-# Converte colunas específicas para tipos numéricos e de texto, conforme necessário
-# Substitua 'Nome_da_Coluna_Numérica' e 'Nome_da_Coluna_Texto' pelos nomes reais de suas colunas
-
-# Converte as colunas que devem ser numéricas
-for col in ['Diâmetro Broca', 'Diâmetro Revestimento']:  # Substitua com as colunas apropriadas
-    df[col] = pd.to_numeric(df[col], errors='coerce')  # Converte para numérico, define 'NaN' para valores inválidos
-
-# Converte as colunas que devem ser strings
-for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda']:  # Substitua com as colunas apropriadas
-    df[col] = df[col].astype(str)  # Garante que essas colunas sejam do tipo string
-
 
 # Dicionário para armazenar listas de linhas manuais entre as linhas automáticas
 if 'manual_rows' not in st.session_state:
     st.session_state.manual_rows = {}
-if 'automatic_rows' not in st.session_state:
-    st.session_state.automatic_rows = []
+
+def add_manual_row(below_index):
+    """Função para adicionar uma nova linha manual abaixo de uma linha automática."""
+    if below_index not in st.session_state.manual_rows:
+        st.session_state.manual_rows[below_index] = []
+    st.session_state.manual_rows[below_index].append(len(st.session_state.manual_rows[below_index]) + 1)
 
 if uploaded_file is not None:
     try:
         # Carregar o arquivo principal
         df = pd.read_excel(uploaded_file)
+        
+        # Converte colunas específicas para tipos numéricos e de texto, conforme necessário
+        # Atualize os nomes das colunas conforme necessário
+        for col in ['Diâmetro Broca', 'Diâmetro Revestimento']:  # Colunas que devem ser numéricas
+            df[col] = pd.to_numeric(df[col], errors='coerce')  # Converte para numérico e define NaN para valores inválidos
+        
+        for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda']:  # Colunas que devem ser strings
+            df[col] = df[col].astype(str)  # Garante que essas colunas sejam do tipo string
         
         # Exibir o número de linhas e colunas do arquivo principal
         st.success(f"Arquivo principal carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
@@ -82,15 +68,7 @@ if uploaded_file is not None:
             st.success("Arquivo de referência carregado com sucesso!")
 
             for i, row in df_reference.iterrows():
-                if i not in st.session_state.automatic_rows:
-                    st.session_state.automatic_rows.append(i)
-
                 st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
-
-                # Botão para excluir linha automática
-                if st.button(f"Excluir Linha {i + 1}"):
-                    delete_row(i)
-                    continue  # Pule o resto do loop para essa linha
 
                 # Obter valores de filtro da linha do arquivo de referência, ignorando colunas com valor "TODOS"
                 atividade = row.get('ATIVIDADE') if row.get('ATIVIDADE') != "TODOS" else None
@@ -106,44 +84,44 @@ if uploaded_file is not None:
                 col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
-                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', ['Todos'] + sorted(df['ATIVIDADE'].unique()), index=(df['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade else 0)
+                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', sorted(['Todos'] + df['ATIVIDADE'].unique().tolist()), index=(df['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade else 0)
                     if atividade == 'Todos':
                         atividade = None
 
                 with col2:
-                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', ['Todos'] + sorted(df['OPERACAO'].unique()), index=(df['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao else 0)
+                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', sorted(['Todos'] + df['OPERACAO'].unique().tolist()), index=(df['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao else 0)
                     if operacao == 'Todos':
                         operacao = None
 
                 with col3:
-                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', ['Todos'] + sorted(df['ETAPA'].unique()), index=(df['ETAPA'].unique().tolist().index(etapa) + 1) if etapa else 0)
+                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', sorted(['Todos'] + df['ETAPA'].unique().tolist()), index=(df['ETAPA'].unique().tolist().index(etapa) + 1) if etapa else 0)
                     if etapa == 'Todos':
                         etapa = None
 
                 with col4:
-                    fase = st.selectbox(f'FASE (Linha {i + 1}):', ['Todos'] + sorted(df['FASE'].unique()), index=(df['FASE'].unique().tolist().index(fase) + 1) if fase else 0)
+                    fase = st.selectbox(f'FASE (Linha {i + 1}):', sorted(['Todos'] + df['FASE'].unique().tolist()), index=(df['FASE'].unique().tolist().index(fase) + 1) if fase else 0)
                     if fase == 'Todos':
                         fase = None
 
                 col5, col6, col7, col8 = st.columns(4)
 
                 with col5:
-                    obz = st.selectbox(f'OBZ (Linha {i + 1}):', ['Todos'] + sorted(df['Obz'].unique()), index=(df['Obz'].unique().tolist().index(obz) + 1) if obz else 0)
+                    obz = st.selectbox(f'OBZ (Linha {i + 1}):', sorted(['Todos'] + df['Obz'].unique().tolist()), index=(df['Obz'].unique().tolist().index(obz) + 1) if obz else 0)
                     if obz == 'Todos':
                         obz = None
 
                 with col6:
-                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha {i + 1}):', ['Todos'] + sorted(df['Diâmetro Broca'].unique()), default=broca or 'Todos')
+                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha {i + 1}):', sorted(['Todos'] + df['Diâmetro Broca'].dropna().unique().tolist()), default=broca or 'Todos')
                     if 'Todos' in broca:
                         broca = None
 
                 with col7:
-                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}):', ['Todos'] + sorted(df['Diâmetro Revestimento'].unique()), default=revestimento or 'Todos')
+                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}):', sorted(['Todos'] + df['Diâmetro Revestimento'].dropna().unique().tolist()), default=revestimento or 'Todos')
                     if 'Todos' in revestimento:
                         revestimento = None
 
                 with col8:
-                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}):', ['Todos'] + sorted(df['Tipo_sonda'].unique()), default=tipo_sonda or 'Todos')
+                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}):', sorted(['Todos'] + df['Tipo_sonda'].unique().tolist()), default=tipo_sonda or 'Todos')
                     if 'Todos' in tipo_sonda:
                         tipo_sonda = None
 
@@ -179,40 +157,35 @@ if uploaded_file is not None:
                             f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual {manual_row_num}</div>",
                             unsafe_allow_html=True
                         )
-
-                        # Botão para excluir linha manual
-                        if st.button(f"Excluir Linha Manual {manual_row_num} abaixo de Linha {i + 1}"):
-                            delete_row(i + 1, is_manual=True, manual_index=manual_row_num)
-                            continue  # Pule o resto do loop para essa linha manual
-
+                        
                         # Campos de entrada para a linha manual
                         col1, col2, col3, col4 = st.columns(4)
 
                         with col1:
-                            atividade = st.selectbox(f'ATIVIDADE (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['ATIVIDADE'].unique()))
+                            atividade = st.selectbox(f'ATIVIDADE (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['ATIVIDADE'].unique().tolist()))
                         
                         with col2:
-                            operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['OPERACAO'].unique()))
+                            operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['OPERACAO'].unique().tolist()))
                         
                         with col3:
-                            etapa = st.selectbox(f'ETAPA (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['ETAPA'].unique()))
+                            etapa = st.selectbox(f'ETAPA (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['ETAPA'].unique().tolist()))
                         
                         with col4:
-                            fase = st.selectbox(f'FASE (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['FASE'].unique()))
+                            fase = st.selectbox(f'FASE (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['FASE'].unique().tolist()))
 
                         col5, col6, col7, col8 = st.columns(4)
 
                         with col5:
-                            obz = st.selectbox(f'OBZ (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Obz'].unique()))
+                            obz = st.selectbox(f'OBZ (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Obz'].unique().tolist()))
                         
                         with col6:
-                            broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Diâmetro Broca'].unique()))
+                            broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Diâmetro Broca'].dropna().unique().tolist()))
                         
                         with col7:
-                            revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Diâmetro Revestimento'].unique()))
+                            revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Diâmetro Revestimento'].dropna().unique().tolist()))
                         
                         with col8:
-                            tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Tipo_sonda'].unique()))
+                            tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Tipo_sonda'].unique().tolist()))
 
                         # Aplicar o filtro para a linha manual e exibir os dados
                         df_manual_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
@@ -247,39 +220,34 @@ if uploaded_file is not None:
                     unsafe_allow_html=True
                 )
 
-                # Botão para excluir linha manual no final
-                if st.button(f"Excluir Linha Manual {manual_row_num} (Final)"):
-                    delete_row(-1, is_manual=True, manual_index=manual_row_num)
-                    continue
-
                 # Campos de entrada para a linha manual no final
                 col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
-                    atividade = st.selectbox(f'ATIVIDADE (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['ATIVIDADE'].unique()))
+                    atividade = st.selectbox(f'ATIVIDADE (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['ATIVIDADE'].unique().tolist()))
                 
                 with col2:
-                    operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['OPERACAO'].unique()))
+                    operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['OPERACAO'].unique().tolist()))
                 
                 with col3:
-                    etapa = st.selectbox(f'ETAPA (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['ETAPA'].unique()))
+                    etapa = st.selectbox(f'ETAPA (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['ETAPA'].unique().tolist()))
                 
                 with col4:
-                    fase = st.selectbox(f'FASE (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['FASE'].unique()))
+                    fase = st.selectbox(f'FASE (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['FASE'].unique().tolist()))
 
                 col5, col6, col7, col8 = st.columns(4)
 
                 with col5:
-                    obz = st.selectbox(f'OBZ (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Obz'].unique()))
+                    obz = st.selectbox(f'OBZ (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Obz'].unique().tolist()))
                 
                 with col6:
-                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Diâmetro Broca'].unique()))
+                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Diâmetro Broca'].dropna().unique().tolist()))
                 
                 with col7:
-                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Diâmetro Revestimento'].unique()))
+                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Diâmetro Revestimento'].dropna().unique().tolist()))
                 
                 with col8:
-                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {manual_row_num}):', ['Todos'] + sorted(df['Tipo_sonda'].unique()))
+                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {manual_row_num}):', sorted(['Todos'] + df['Tipo_sonda'].unique().tolist()))
 
                 # Aplicar o filtro para a linha manual final e exibir os dados
                 df_final_manual_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)

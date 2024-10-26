@@ -29,10 +29,10 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
 st.set_page_config(layout="wide")
 
 # Upload do arquivo principal
-uploaded_file = st.file_uploader("Upload do arquivo principal Excel", type="xlsx")
+uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type="xlsx")
 
 # Upload do arquivo de referência
-uploaded_reference = st.file_uploader("Upload do arquivo de referência para filtros", type="xlsx")
+uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
 if uploaded_file is not None:
     try:

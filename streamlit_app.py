@@ -35,7 +35,12 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
 # Lista para armazenar linhas manuais adicionadas
-manual_rows = []
+if 'manual_rows' not in st.session_state:
+    st.session_state.manual_rows = []
+
+# Função para adicionar nova linha manual
+def add_manual_row():
+    st.session_state.manual_rows.append(len(st.session_state.manual_rows) + 1)
 
 if uploaded_file is not None:
     try:
@@ -133,10 +138,10 @@ if uploaded_file is not None:
 
         # Adicionar novas linhas manualmente
         if st.button("Incluir linha"):
-            manual_rows.append(len(manual_rows) + 1)
+            add_manual_row()
 
         # Exibir cada nova linha adicionada manualmente
-        for i, row_num in enumerate(manual_rows, start=1):
+        for row_num in st.session_state.manual_rows:
             st.markdown(
                 f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual {row_num}</div>",
                 unsafe_allow_html=True

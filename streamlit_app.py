@@ -158,13 +158,12 @@ if uploaded_file is not None:
             csv = df_filtrado.to_csv(index=False)
             st.download_button(label="Baixar dados filtrados", data=csv, file_name="dados_filtrados.csv", mime="text/csv")
 
-        # Destacar coluna 'Outlier' com fonte vermelha onde o valor é True
-        def highlight_outliers(val):
-            color = 'red' if val == True else 'black'
-            return f'color: {color}'
+        # Destacar linhas onde 'Outlier' é True
+        def highlight_outliers(row):
+            return ['background-color: yellow' if val == True else '' for val in row]
 
-        st.write("Coluna 'Outlier' destacada (Verdadeiro em vermelho):")
-        st.dataframe(df.style.applymap(highlight_outliers, subset=['Outlier']))
+        st.write("Tabela com destaque nas linhas 'Outlier' = True (em amarelo):")
+        st.dataframe(df.style.apply(highlight_outliers, subset=['Outlier'], axis=1))
 
     except Exception as e:
         st.error(f"Erro ao carregar o arquivo: {e}")

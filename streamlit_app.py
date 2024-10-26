@@ -162,12 +162,12 @@ if uploaded_file is not None:
             csv = df_filtrado.to_csv(index=False)
             st.download_button(label="Baixar dados filtrados", data=csv, file_name="dados_filtrados.csv", mime="text/csv")
 
-        # Destacar visualmente as linhas onde 'Outlier' é True
+        # Destacar em vermelho as células de 'Outlier' com valor True
         def highlight_outliers(val):
-            color = 'yellow' if val else ''
+            color = 'red' if val else ''
             return f'background-color: {color}'
 
-        st.write("Tabela com 'Outlier' como primeira coluna e destaque para valores True (fundo amarelo):")
+        st.write("Tabela com 'Outlier' como primeira coluna e destaque para valores True (fundo vermelho):")
         st.dataframe(df.style.applymap(highlight_outliers, subset=['Outlier']))
 
     except Exception as e:

@@ -150,7 +150,7 @@ if uploaded_file is not None:
                             f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual {manual_row_num}</div>",
                             unsafe_allow_html=True
                         )
-                        
+
                         # Campos de entrada para a linha manual
                         col1, col2, col3, col4 = st.columns(4)
 
@@ -179,6 +179,27 @@ if uploaded_file is not None:
                         
                         with col8:
                             tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {manual_row_num}):', ['Todos'] + df['Tipo_sonda'].unique().tolist())
+
+                        # Aplicar o filtro para a linha manual e exibir os dados
+                        df_manual_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
+                        df_manual_non_outliers = df_manual_filtered[df_manual_filtered['Outlier'] == False]
+                        df_manual_outliers = df_manual_filtered[df_manual_filtered['Outlier'] == True]
+
+                        st.markdown(
+                            f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
+                            f"Quantidade de Amostras sem Outliers (Linha Manual {manual_row_num}): <strong>{df_manual_non_outliers.shape[0]}</strong>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                        st.dataframe(df_manual_non_outliers.reset_index(drop=True))
+
+                        st.markdown(
+                            f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
+                            f"Quantidade de Amostras com Outliers (Linha Manual {manual_row_num}): <strong>{df_manual_outliers.shape[0]}</strong>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                        st.dataframe(df_manual_outliers.reset_index(drop=True))
 
         # Adicionar linha manual globalmente (independente das linhas automáticas)
         if st.button("Incluir linha manual no final"):
@@ -220,6 +241,27 @@ if uploaded_file is not None:
                 
                 with col8:
                     tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {manual_row_num}):', ['Todos'] + df['Tipo_sonda'].unique().tolist())
+
+                # Aplicar o filtro para a linha manual final e exibir os dados
+                df_final_manual_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
+                df_final_manual_non_outliers = df_final_manual_filtered[df_final_manual_filtered['Outlier'] == False]
+                df_final_manual_outliers = df_final_manual_filtered[df_final_manual_filtered['Outlier'] == True]
+
+                st.markdown(
+                    f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
+                    f"Quantidade de Amostras sem Outliers (Linha Manual {manual_row_num} - Final): <strong>{df_final_manual_non_outliers.shape[0]}</strong>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+                st.dataframe(df_final_manual_non_outliers.reset_index(drop=True))
+
+                st.markdown(
+                    f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
+                    f"Quantidade de Amostras com Outliers (Linha Manual {manual_row_num} - Final): <strong>{df_final_manual_outliers.shape[0]}</strong>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+                st.dataframe(df_final_manual_outliers.reset_index(drop=True))
 
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")

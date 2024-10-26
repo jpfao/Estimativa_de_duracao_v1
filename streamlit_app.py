@@ -102,9 +102,9 @@ if uploaded_file is not None:
         )
         st.dataframe(df_non_outliers.reset_index(drop=True))
 
-        # Exibir quantidade e tabela de amostras onde 'Outlier' é True com estilo customizado
+        # Exibir quantidade e tabela de amostras onde 'Outlier' é True com estilo customizado e espaçamento uniforme
         st.markdown(
-            f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin-top: 20px; color: #8B0000; font-size: 18px; text-align: center;'>"
+            f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
             f"Quantidade de Amostras com Outliers: <strong>{df_outliers.shape[0]}</strong>"
             f"</div>",
             unsafe_allow_html=True
@@ -115,3 +115,4 @@ if uploaded_file is not None:
         st.error(f"Erro ao carregar o arquivo: {e}")
 else:
     st.warning("Nenhum arquivo foi carregado.")
+

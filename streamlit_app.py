@@ -34,13 +34,15 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
-# Lista para armazenar linhas manuais adicionadas
+# Dicionário para armazenar as linhas manuais inseridas entre as linhas automáticas
 if 'manual_rows' not in st.session_state:
-    st.session_state.manual_rows = []
+    st.session_state.manual_rows = {}
 
-# Função para adicionar nova linha manual
-def add_manual_row():
-    st.session_state.manual_rows.append(len(st.session_state.manual_rows) + 1)
+# Função para adicionar nova linha manual em uma posição específica
+def add_manual_row(position):
+    if position not in st.session_state.manual_rows:
+        st.session_state.manual_rows[position] = []
+    st.session_state.manual_rows[position].append(len(st.session_state.manual_rows[position]) + 1)
 
 if uploaded_file is not None:
     try:
@@ -136,48 +138,52 @@ if uploaded_file is not None:
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
 
-        # Adicionar novas linhas manualmente
-        if st.button("Incluir linha"):
-            add_manual_row()
 
-        # Exibir cada nova linha adicionada manualmente
-        for row_num in st.session_state.manual_rows:
-            st.markdown(
-                f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual {row_num}</div>",
-                unsafe_allow_html=True
-            )
+                # Botão para incluir linha manual entre as linhas automáticas
+                if st.button(f"Incluir linha abaixo da Linha {i + 1}", key=f"add_below_{i}"):
+                    add_manual_row(i)
 
-            # Campos de entrada para a linha manual
-            col1, col2, col3, col4 = st.columns(4)
+                # Renderizar as linhas manuais inseridas abaixo de cada linha automática
+                if i in st.session_state.manual_rows:
+                    for row_num in st.session_state.manual_rows[i]:
+                        st.markdown(
+                            f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual Inserida {row_num} abaixo da Linha {i + 1}</div>",
+                            unsafe_allow_html=True
+                        )
 
-            with col1:
-                atividade = st.selectbox(f'ATIVIDADE (Linha Manual {row_num}):', ['Todos'] + df['ATIVIDADE'].unique().tolist())
-            
-            with col2:
-                operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {row_num}):', ['Todos'] + df['OPERACAO'].unique().tolist())
-            
-            with col3:
-                etapa = st.selectbox(f'ETAPA (Linha Manual {row_num}):', ['Todos'] + df['ETAPA'].unique().tolist())
-            
-            with col4:
-                fase = st.selectbox(f'FASE (Linha Manual {row_num}):', ['Todos'] + df['FASE'].unique().tolist())
+                        # Campos de entrada para a linha manual
+                        col1, col2, col3, col4 = st.columns(4)
 
-            col5, col6, col7, col8 = st.columns(4)
+                        with col1:
+                            atividade = st.selectbox(f'ATIVIDADE (Linha Manual {row_num}):', ['Todos'] + df['ATIVIDADE'].unique().tolist())
+                        
+                        with col2:
+                            operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {row_num}):', ['Todos'] + df['OPERACAO'].unique().tolist())
+                        
+                        with col3:
+                            etapa = st.selectbox(f'ETAPA (Linha Manual {row_num}):', ['Todos'] + df['ETAPA'].unique().tolist())
+                        
+                        with col4:
+                            fase = st.selectbox(f'FASE (Linha Manual {row_num}):', ['Todos'] + df['FASE'].unique().tolist())
 
-            with col5:
-                obz = st.selectbox(f'OBZ (Linha Manual {row_num}):', ['Todos'] + df['Obz'].unique().tolist())
-            
-            with col6:
-                broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {row_num}):', ['Todos'] + df['Diâmetro Broca'].unique().tolist())
-            
-            with col7:
-                revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {row_num}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist())
-            
-            with col8:
-                tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {row_num}):', ['Todos'] + df['Tipo_sonda'].unique().tolist())
+                        col5, col6, col7, col8 = st.columns(4)
+
+                        with col5:
+                            obz = st.selectbox(f'OBZ (Linha Manual {row_num}):', ['Todos'] + df['Obz'].unique().tolist())
+                        
+                        with col6:
+                            broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {row_num}):', ['Todos'] + df['Diâmetro Broca'].unique().tolist())
+                        
+                        with col7:
+                            revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {row_num}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist())
+                        
+                        with col8:
+                            tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {row_num}):', ['Todos'] + df['Tipo_sonda'].unique().tolist())
 
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
 
 else:
     st.warning("Nenhum arquivo foi carregado.")
+
+

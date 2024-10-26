@@ -46,9 +46,8 @@ uploaded_file = st.file_uploader("Upload do arquivo Excel", type="xlsx")
 
 if uploaded_file is not None:
     try:
-        # Carregar o arquivo Excel e remover outliers
+        # Carregar o arquivo Excel
         df = pd.read_excel(uploaded_file)
-        df = df[df['Outlier'] == False]
         
         # Exibir o número de linhas e colunas do arquivo
         st.success(f"Arquivo carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
@@ -171,3 +170,4 @@ if uploaded_file is not None:
         st.error(f"Erro ao carregar o arquivo: {e}")
 else:
     st.warning("Nenhum arquivo foi carregado.")
+

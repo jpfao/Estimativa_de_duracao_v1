@@ -139,3 +139,35 @@ if uploaded_file is not None:
         for i, row_num in enumerate(manual_rows, start=1):
             st.markdown(
                 f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual {row_num}</div>",
+                unsafe_allow_html=True
+            )
+        
+            # Campos de entrada para a linha manual
+            col1, col2, col3, col4 = st.columns(4)
+        
+            with col1:
+                atividade = st.selectbox(f'ATIVIDADE (Linha Manual {row_num}):', ['Todos'] + df['ATIVIDADE'].unique().tolist())
+            
+            with col2:
+                operacao = st.selectbox(f'OPERAÇÃO (Linha Manual {row_num}):', ['Todos'] + df['OPERACAO'].unique().tolist())
+            
+            with col3:
+                etapa = st.selectbox(f'ETAPA (Linha Manual {row_num}):', ['Todos'] + df['ETAPA'].unique().tolist())
+            
+            with col4:
+                fase = st.selectbox(f'FASE (Linha Manual {row_num}):', ['Todos'] + df['FASE'].unique().tolist())
+        
+            col5, col6, col7, col8 = st.columns(4)
+        
+            with col5:
+                obz = st.selectbox(f'OBZ (Linha Manual {row_num}):', ['Todos'] + df['Obz'].unique().tolist())
+            
+            with col6:
+                broca = st.multiselect(f'DIÂMETRO BROCA (Linha Manual {row_num}):', ['Todos'] + df['Diâmetro Broca'].unique().tolist())
+            
+            with col7:
+                revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha Manual {row_num}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist())
+            
+            with col8:
+                tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {row_num}):', ['Todos'] + df['Tipo_sonda'].unique().tolist())
+        

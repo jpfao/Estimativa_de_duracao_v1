@@ -34,6 +34,9 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
+# Lista para armazenar linhas manuais adicionadas
+manual_rows = []
+
 if uploaded_file is not None:
     try:
         # Carregar o arquivo principal
@@ -44,12 +47,11 @@ if uploaded_file is not None:
         
         st.title('Formulário Interativo para Sequência Operacional')
 
+        # Carregar e exibir linhas do arquivo de referência
         if uploaded_reference is not None:
-            # Carregar o arquivo de referência
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
-            # Loop para criar uma seção de filtro para cada linha do arquivo de referência
             for i, row in df_reference.iterrows():
                 st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
 
@@ -63,7 +65,7 @@ if uploaded_file is not None:
                 revestimento = [row.get('Diâmetro Revestimento')] if pd.notna(row.get('Diâmetro Revestimento')) and row.get('Diâmetro Revestimento') != "TODOS" else None
                 tipo_sonda = [row.get('Tipo_sonda')] if pd.notna(row.get('Tipo_sonda')) and row.get('Tipo_sonda') != "TODOS" else None
 
-                # Renderizar campos com valores pré-preenchidos do arquivo de referência, mas que podem ser ajustados manualmente
+                # Renderizar campos com valores pré-preenchidos do arquivo de referência
                 col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
@@ -108,14 +110,11 @@ if uploaded_file is not None:
                     if 'Todos' in tipo_sonda:
                         tipo_sonda = None
 
-                # Aplicar filtro com base nos valores da linha do arquivo de referência (ou ajustados manualmente)
+                # Aplicar filtro e exibir os dados
                 df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
-
-                # Dividir os dados filtrados em Outliers e Não-Outliers
                 df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
                 df_outliers = df_filtered[df_filtered['Outlier'] == True]
 
-                # Exibir quantidade e tabela de amostras onde 'Outlier' é False com estilo customizado
                 st.markdown(
                     f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
                     f"Quantidade de Amostras sem Outliers (Linha {i + 1}): <strong>{df_non_outliers.shape[0]}</strong>"
@@ -124,7 +123,6 @@ if uploaded_file is not None:
                 )
                 st.dataframe(df_non_outliers.reset_index(drop=True))
 
-                # Exibir quantidade e tabela de amostras onde 'Outlier' é True com estilo customizado e espaçamento uniforme
                 st.markdown(
                     f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
                     f"Quantidade de Amostras com Outliers (Linha {i + 1}): <strong>{df_outliers.shape[0]}</strong>"
@@ -133,5 +131,10 @@ if uploaded_file is not None:
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
 
-    except Exception as e:
-        st.error(f"Ocorreu um erro: {e}")
+        # Adicionar novas linhas manualmente
+        if st.button("Incluir linha"):
+            manual_rows.append(len(manual_rows) + 1)
+
+        # Exibir cada nova linha adicionada manualmente
+        for i, row_num in enumerate(manual_rows, start=1):
+            st.markdown(f"<div style='background-color: #8B008B;

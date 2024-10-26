@@ -141,10 +141,10 @@ if uploaded_file is not None:
                 f"<div style='background-color: #8B008B; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha Manual {row_num}</div>",
                 unsafe_allow_html=True
             )
-        
+
             # Campos de entrada para a linha manual
             col1, col2, col3, col4 = st.columns(4)
-        
+
             with col1:
                 atividade = st.selectbox(f'ATIVIDADE (Linha Manual {row_num}):', ['Todos'] + df['ATIVIDADE'].unique().tolist())
             
@@ -156,9 +156,9 @@ if uploaded_file is not None:
             
             with col4:
                 fase = st.selectbox(f'FASE (Linha Manual {row_num}):', ['Todos'] + df['FASE'].unique().tolist())
-        
+
             col5, col6, col7, col8 = st.columns(4)
-        
+
             with col5:
                 obz = st.selectbox(f'OBZ (Linha Manual {row_num}):', ['Todos'] + df['Obz'].unique().tolist())
             
@@ -170,4 +170,9 @@ if uploaded_file is not None:
             
             with col8:
                 tipo_sonda = st.multiselect(f'TIPO SONDA (Linha Manual {row_num}):', ['Todos'] + df['Tipo_sonda'].unique().tolist())
-        
+
+    except Exception as e:
+        st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
+
+else:
+    st.warning("Nenhum arquivo foi carregado.")

@@ -134,7 +134,7 @@ if uploaded_file is not None:
                     )
                     st.dataframe(df_non_outliers.reset_index(drop=True))
 
-                                        st.markdown(
+                    st.markdown(
                         f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
                         f"Quantidade de Amostras com Outliers (Linha {i + 1}, {avancado}): <strong>{df_outliers.shape[0]}</strong>"
                         f"</div>",

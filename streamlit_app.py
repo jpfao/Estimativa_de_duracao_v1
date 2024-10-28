@@ -44,9 +44,13 @@ def plot_boxplot_with_plotly(data, column, lim_inf, lim_sup, title):
     ))
     
     # Adicionar linhas de referência
-    fig.add_vline(x=data[column].median(), line=dict(color="green", dash="dash"), name="Mediana", annotation_text=f"Mediana: {data[column].median():.2f}")
-    fig.add_vline(x=lim_inf, line=dict(color="blue", dash="dash"), name="Limite Inferior", annotation_text=f"Limite Inferior: {lim_inf:.2f}")
-    fig.add_vline(x=lim_sup, line=dict(color="orange", dash="dash"), name="Limite Superior", annotation_text=f"Limite Superior: {lim_sup:.2f}")
+    median = round(data[column].median(), 1)
+    lim_inf = round(lim_inf, 1)
+    lim_sup = round(lim_sup, 1)
+    
+    fig.add_vline(x=median, line=dict(color="green", dash="dash"), name="Mediana", annotation_text=f"Mediana: {median:.1f}")
+    fig.add_vline(x=lim_inf, line=dict(color="blue", dash="dash"), name="Limite Inferior", annotation_text=f"Limite Inferior: {lim_inf:.1f}")
+    fig.add_vline(x=lim_sup, line=dict(color="orange", dash="dash"), name="Limite Superior", annotation_text=f"Limite Superior: {lim_sup:.1f}")
     
     # Configurações do layout
     fig.update_layout(
@@ -77,6 +81,11 @@ if uploaded_file is not None:
         for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda', 'Diâmetro Broca', 'Diâmetro Revestimento']:
             df[col] = df[col].astype(str)
         
+        # Formatar os valores de 'Taxa', 'LIM_INF_OUT' e 'LIM_SUP_OUT' para uma casa decimal
+        df['Taxa'] = df['Taxa'].round(1)
+        df['LIM_INF_OUT'] = df['LIM_INF_OUT'].round(1)
+        df['LIM_SUP_OUT'] = df['LIM_SUP_OUT'].round(1)
+
         # Exibir o número de linhas e colunas do arquivo principal
         st.success(f"Arquivo principal carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
         

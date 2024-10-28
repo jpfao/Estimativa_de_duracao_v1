@@ -138,7 +138,7 @@ if uploaded_file is not None:
 
                     with col7:
                         revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}, {avancado}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
-                        if 'Todos' in                             revestimento = None
+                        if 'Todos' in revestimento = None
 
                     with col8:
                         tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}, {avancado}):', ['Todos'] + df['Tipo_sonda'].unique().tolist(), default=tipo_sonda or ['Todos'])

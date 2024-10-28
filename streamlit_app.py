@@ -135,5 +135,14 @@ if uploaded_file is not None:
                 st.markdown(
                     f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
                     f"Quantidade de Amostras com Outliers (Linha {i}): <strong>{df_outliers.shape[0]}</strong>"
-                    f"</div>",
-                    unsafe_allow
+                                        f"</div>",
+                    unsafe_allow_html=True
+                )
+                st.dataframe(df_outliers.reset_index(drop=True))
+
+    except Exception as e:
+        st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
+
+else:
+    st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
+

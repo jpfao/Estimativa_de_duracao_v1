@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Função para filtrar as opções e remover outliers
 @st.cache_data
@@ -31,25 +31,34 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     
     return df_filtered
 
-# Função para gerar o boxplot com rótulos, com tamanho reduzido
-def plot_boxplot_with_labels(data, column, lim_inf, lim_sup, title):
-    plt.figure(figsize=(3, 1.5))  # Reduzir ainda mais o tamanho do gráfico
-    sns.boxplot(x=data[column], color='lightblue', flierprops={'marker': 'o', 'color': 'red'})
-    median_value = data[column].median()
+# Função para gerar o boxplot com Plotly
+def plot_boxplot_with_plotly(data, column, lim_inf, lim_sup, title):
+    fig = go.Figure()
     
-    # Adicionar rótulos para a mediana, limite inferior e limite superior
-    plt.axvline(median_value, color='green', linestyle='--', label=f'Mediana: {median_value:.2f}')
-    plt.axvline(lim_inf, color='blue', linestyle='--', label=f'Limite Inferior: {lim_inf:.2f}')
-    plt.axvline(lim_sup, color='orange', linestyle='--', label=f'Limite Superior: {lim_sup:.2f}')
+    # Adicionar boxplot
+    fig.add_trace(go.Box(
+        x=data[column],
+        marker=dict(color='lightblue'),
+        boxpoints='all',
+        jitter=0.3,
+        pointpos=-1.8
+    ))
     
-    plt.title(title, fontsize=8)  # Ajustar o tamanho da fonte do título
-    plt.xlabel(column, fontsize=6)  # Ajustar o tamanho da fonte do rótulo
-    plt.xticks(fontsize=5)  # Ajustar o tamanho da fonte dos ticks
-    plt.yticks(fontsize=5)
-    plt.legend(fontsize=5)  # Ajustar o tamanho da fonte da legenda
-    plt.grid()
-    st.pyplot(plt.gcf())  # Mostrar o gráfico no Streamlit
-    plt.close()
+    # Adicionar linhas de referência
+    fig.add_vline(x=data[column].median(), line=dict(color="green", dash="dash"), name="Mediana", annotation_text=f"Mediana: {data[column].median():.2f}")
+    fig.add_vline(x=lim_inf, line=dict(color="blue", dash="dash"), name="Limite Inferior", annotation_text=f"Limite Inferior: {lim_inf:.2f}")
+    fig.add_vline(x=lim_sup, line=dict(color="orange", dash="dash"), name="Limite Superior", annotation_text=f"Limite Superior: {lim_sup:.2f}")
+    
+    # Configurações do layout
+    fig.update_layout(
+        title=title,
+        width=400,  # Largura do gráfico
+        height=200,  # Altura do gráfico
+        margin=dict(l=40, r=40, t=40, b=40),
+        showlegend=False
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
 
 # Definir a largura da página como ampla
 st.set_page_config(layout="wide")
@@ -137,7 +146,7 @@ if uploaded_file is not None:
                             broca = None
 
                     with col7:
-                        revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}, {avancado}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
+                        revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}, {avancado}):['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
                         if 'Todos' in revestimento:
                             revestimento = None
 
@@ -153,11 +162,11 @@ if uploaded_file is not None:
 
                     # Exibir o gráfico correspondente para cada grupo
                     if avancado == "Com avanço" and not df_filtered.empty:
-                        plot_boxplot_with_labels(df_filtered, 'Taxa', df_filtered['LIM_INF_OUT'].min(), df_filtered['LIM_SUP_OUT'].max(),
+                        plot_boxplot_with_plotly(df_filtered, 'Taxa', df_filtered['LIM_INF_OUT'].min(), df_filtered['LIM_SUP_OUT'].max(),
                                                  f'Boxplot de Taxa - Linha {i + 1}, Grupo Com avanço')
                     elif avancado == "Sem avanço" and not df_filtered.empty:
                         df_filtered.rename(columns={'TEMPO_TOTAL_HORAS': 'Tempo em horas'}, inplace=True)
-                        plot_boxplot_with_labels(df_filtered, 'Tempo em horas', df_filtered['LIM_INF_OUT'].min(), df_filtered['LIM_SUP_OUT'].max(),
+                        plot_boxplot_with_plotly(df_filtered, 'Tempo em horas', df_filtered['LIM_INF_OUT'].min(), df_filtered['LIM_SUP_OUT'].max(),
                                                  f'Boxplot de Tempo em horas - Linha {i + 1}, Grupo Sem avanço')
 
                     # Exibir a quantidade de amostras sem e com outliers
@@ -182,4 +191,3 @@ if uploaded_file is not None:
 
 else:
     st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
-

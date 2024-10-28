@@ -16,11 +16,11 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
         df_filtered = df_filtered[df_filtered['FASE'] == fase]
     if obz and obz != "TODOS":
         df_filtered = df_filtered[df_filtered['Obz'] == obz]
-    if broca and isinstance(broca, list) and 'TODOS' not in broca:
+    if broca and 'TODOS' not in broca:
         df_filtered = df_filtered[df_filtered['Diâmetro Broca'].isin(broca)]
-    if revestimento and isinstance(revestimento, list) and 'TODOS' not in revestimento:
+    if revestimento and 'TODOS' not in revestimento:
         df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].isin(revestimento)]
-    if tipo_sonda and isinstance(tipo_sonda, list) and 'TODOS' not in tipo_sonda:
+    if tipo_sonda and 'TODOS' not in tipo_sonda:
         df_filtered = df_filtered[df_filtered['Tipo_sonda'].isin(tipo_sonda)]
     
     return df_filtered
@@ -62,35 +62,81 @@ if uploaded_file is not None:
                 operacao = row.get('OPERACAO')
                 etapa = row.get('ETAPA')
                 fase = str(row.get('FASE'))  # Converter para string para garantir a compatibilidade
-                tipo_sonda = row.get('Tipo_sonda')
+                obz = row.get('Obz')
                 broca = [row.get('Diâmetro Broca')] if pd.notna(row.get('Diâmetro Broca')) else None
                 revestimento = [row.get('Diâmetro Revestimento')] if pd.notna(row.get('Diâmetro Revestimento')) else None
+                tipo_sonda = [row.get('Tipo_sonda')] if pd.notna(row.get('Tipo_sonda')) else None
                 
-                # Grupos de amostras: "Com avanço" e "Sem avanço"
-                for avancado in ["Com avanço", "Sem avanço"]:
-                    st.markdown(f"<div style='background-color: #CCCCCC; padding: 5px; margin-top: 10px; color: #333333; text-align: center;'>Grupo: {avancado}</div>", unsafe_allow_html=True)
-                    
-                    # Aplicar filtro e exibir os dados
-                    df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=avancado, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
-                    df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
-                    df_outliers = df_filtered[df_filtered['Outlier'] == True]
-                    
-                    # Exibir a quantidade de amostras sem e com outliers
-                    st.markdown(
-                        f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
-                        f"Quantidade de Amostras sem Outliers (Linha {i + 1}, {avancado}): <strong>{df_non_outliers.shape[0]}</strong>"
-                        f"</div>",
-                        unsafe_allow_html=True
-                    )
-                    st.dataframe(df_non_outliers.reset_index(drop=True))
-                    
-                    st.markdown(
-                        f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
-                        f"Quantidade de Amostras com Outliers (Linha {i + 1}, {avancado}): <strong>{df_outliers.shape[0]}</strong>"
-                        f"</div>",
-                        unsafe_allow_html=True
-                    )
-                    st.dataframe(df_outliers.reset_index(drop=True))
+                # Renderizar campos com valores pré-preenchidos do arquivo de referência
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', ['Todos'] + df['ATIVIDADE'].unique().tolist(), 
+                                             index=(df['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade and atividade in df['ATIVIDADE'].unique() else 0)
+                    if atividade == 'Todos':
+                        atividade = None
+                
+                with col2:
+                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', ['Todos'] + df['OPERACAO'].unique().tolist(), 
+                                            index=(df['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao and operacao in df['OPERACAO'].unique() else 0)
+                    if operacao == 'Todos':
+                        operacao = None
+                
+                with col3:
+                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', ['Todos'] + df['ETAPA'].unique().tolist(), 
+                                         index=(df['ETAPA'].unique().tolist().index(etapa) + 1) if etapa and etapa in df['ETAPA'].unique() else 0)
+                    if etapa == 'Todos':
+                        etapa = None
+                
+                with col4:
+                    fase = st.selectbox(f'FASE (Linha {i + 1}):', ['Todos'] + df['FASE'].unique().tolist(), 
+                                        index=(df['FASE'].unique().tolist().index(fase) + 1) if fase and fase in df['FASE'].unique() else 0)
+                    if fase == 'Todos':
+                        fase = None
+                
+                col5, col6, col7, col8 = st.columns(4)
+                
+                with col5:
+                    obz = st.selectbox(f'OBZ (Linha {i + 1}):', ['Todos'] + df['Obz'].unique().tolist(), 
+                                       index=(df['Obz'].unique().tolist().index(obz) + 1) if obz and obz in df['Obz'].unique() else 0)
+                    if obz == 'Todos':
+                        obz = None
+                
+                with col6:
+                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha {i + 1}):', ['Todos'] + df['Diâmetro Broca'].unique().tolist(), default=broca or ['Todos'])
+                    if 'Todos' in broca:
+                        broca = None
+                
+                with col7:
+                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
+                    if 'Todos' in revestimento:
+                        revestimento = None
+                
+                with col8:
+                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}):', ['Todos'] + df['Tipo_sonda'].unique().tolist(), default=tipo_sonda or ['Todos'])
+                    if 'Todos' in tipo_sonda:
+                        tipo_sonda = None
+                
+                # Aplicar filtro e exibir os dados
+                df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
+                df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
+                df_outliers = df_filtered[df_filtered['Outlier'] == True]
+                
+                st.markdown(
+                    f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
+                    f"Quantidade de Amostras sem Outliers (Linha {i + 1}): <strong>{df_non_outliers.shape[0]}</strong>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+                st.dataframe(df_non_outliers.reset_index(drop=True))
+                
+                st.markdown(
+                    f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
+                    f"Quantidade de Amostras com Outliers (Linha {i + 1}): <strong>{df_outliers.shape[0]}</strong>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+                st.dataframe(df_outliers.reset_index(drop=True))
 
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")

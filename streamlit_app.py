@@ -16,11 +16,11 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
         df_filtered = df_filtered[df_filtered['FASE'] == fase]
     if obz and obz != "TODOS":
         df_filtered = df_filtered[df_filtered['Obz'] == obz]
-    if broca and 'TODOS' not in broca:
+    if broca and isinstance(broca, list) and 'TODOS' not in broca:
         df_filtered = df_filtered[df_filtered['Diâmetro Broca'].isin(broca)]
-    if revestimento and 'TODOS' not in revestimento:
+    if revestimento and isinstance(revestimento, list) and 'TODOS' not in revestimento:
         df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].isin(revestimento)]
-    if tipo_sonda and 'TODOS' not in tipo_sonda:
+    if tipo_sonda and isinstance(tipo_sonda, list) and 'TODOS' not in tipo_sonda:
         df_filtered = df_filtered[df_filtered['Tipo_sonda'].isin(tipo_sonda)]
     
     return df_filtered

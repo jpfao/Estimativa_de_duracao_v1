@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Função para filtrar as opções e remover outliers
+# Função para filtrar as opções e remover outliers, com mensagens de depuração
 @st.cache_data
 def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None, broca=None, revestimento=None, tipo_sonda=None):
     df_filtered = df.copy()  # Trabalhar com cópia para evitar alterações no original
@@ -9,35 +9,30 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     # Aplicar filtros apenas se o valor for diferente de "TODOS" e não for None
     if atividade and atividade != "TODOS":
         df_filtered = df_filtered[df_filtered['ATIVIDADE'] == atividade]
+        st.write(f"Filtrado por ATIVIDADE: {atividade}, {df_filtered.shape[0]} registros encontrados.")
     if operacao and operacao != "TODOS":
         df_filtered = df_filtered[df_filtered['OPERACAO'] == operacao]
+        st.write(f"Filtrado por OPERACAO: {operacao}, {df_filtered.shape[0]} registros encontrados.")
     if etapa and etapa != "TODOS":
         df_filtered = df_filtered[df_filtered['ETAPA'] == etapa]
+        st.write(f"Filtrado por ETAPA: {etapa}, {df_filtered.shape[0]} registros encontrados.")
     if fase and fase != "TODOS":
         df_filtered = df_filtered[df_filtered['FASE'] == fase]
+        st.write(f"Filtrado por FASE: {fase}, {df_filtered.shape[0]} registros encontrados.")
     if obz and obz != "TODOS":
         df_filtered = df_filtered[df_filtered['Obz'] == obz]
+        st.write(f"Filtrado por OBZ: {obz}, {df_filtered.shape[0]} registros encontrados.")
     if broca and isinstance(broca, list) and 'TODOS' not in broca:
         df_filtered = df_filtered[df_filtered['Diâmetro Broca'].isin(broca)]
+        st.write(f"Filtrado por Diâmetro Broca: {broca}, {df_filtered.shape[0]} registros encontrados.")
     if revestimento and isinstance(revestimento, list) and 'TODOS' not in revestimento:
         df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].isin(revestimento)]
+        st.write(f"Filtrado por Diâmetro Revestimento: {revestimento}, {df_filtered.shape[0]} registros encontrados.")
     if tipo_sonda and isinstance(tipo_sonda, list) and 'TODOS' not in tipo_sonda:
         df_filtered = df_filtered[df_filtered['Tipo_sonda'].isin(tipo_sonda)]
+        st.write(f"Filtrado por Tipo_sonda: {tipo_sonda}, {df_filtered.shape[0]} registros encontrados.")
     
     return df_filtered
-
-# Função para obter os valores de uma linha específica
-def obter_valores_linha(df, linha_numero):
-    linha = df[df['Linha'] == linha_numero]
-    if linha.empty:
-        return None
-    return {
-        'FASE': linha['FASE'].values[0],
-        'ATIVIDADE': linha['ATIVIDADE'].values[0],
-        'OPERACAO': linha['OPERACAO'].values[0],
-        'ETAPA': linha['ETAPA'].values[0],
-        'Tipo_sonda': linha['Tipo_sonda'].values[0]
-    }
 
 # Configurar a página para exibição ampla
 st.set_page_config(layout="wide")
@@ -127,7 +122,7 @@ if uploaded_file is not None:
                 st.markdown(
                     f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
                     f"Quantidade de Amostras com Outliers (Linha {i}): <strong>{df_outliers.shape[0]}</strong>"
-                    f"</div>",
+                                        f"</div>",
                     unsafe_allow_html=True
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
@@ -137,3 +132,4 @@ if uploaded_file is not None:
 
 else:
     st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
+

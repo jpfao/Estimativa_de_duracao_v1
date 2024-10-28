@@ -33,7 +33,7 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
 
 # Função para gerar o boxplot com rótulos, com tamanho reduzido
 def plot_boxplot_with_labels(data, column, lim_inf, lim_sup, title):
-    plt.figure(figsize=(6, 3))  # Reduzir o tamanho do gráfico
+    plt.figure(figsize=(4, 2))  # Reduzir o tamanho do gráfico para metade
     sns.boxplot(x=data[column], color='lightblue', flierprops={'marker': 'o', 'color': 'red'})
     median_value = data[column].median()
     
@@ -42,9 +42,11 @@ def plot_boxplot_with_labels(data, column, lim_inf, lim_sup, title):
     plt.axvline(lim_inf, color='blue', linestyle='--', label=f'Limite Inferior: {lim_inf:.2f}')
     plt.axvline(lim_sup, color='orange', linestyle='--', label=f'Limite Superior: {lim_sup:.2f}')
     
-    plt.title(title)
-    plt.xlabel(column)
-    plt.legend()
+    plt.title(title, fontsize=10)  # Ajustar o tamanho da fonte do título
+    plt.xlabel(column, fontsize=8)  # Ajustar o tamanho da fonte do rótulo
+    plt.xticks(fontsize=7)  # Ajustar o tamanho da fonte dos ticks
+    plt.yticks(fontsize=7)
+    plt.legend(fontsize=6)  # Ajustar o tamanho da fonte da legenda
     plt.grid()
     st.pyplot(plt.gcf())  # Mostrar o gráfico no Streamlit
     plt.close()
@@ -136,8 +138,7 @@ if uploaded_file is not None:
 
                     with col7:
                         revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}, {avancado}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
-                        if 'Todos' in revestimento:
-                            revestimento = None
+                        if 'Todos' in                             revestimento = None
 
                     with col8:
                         tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}, {avancado}):', ['Todos'] + df['Tipo_sonda'].unique().tolist(), default=tipo_sonda or ['Todos'])
@@ -180,3 +181,5 @@ if uploaded_file is not None:
 
 else:
     st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
+
+

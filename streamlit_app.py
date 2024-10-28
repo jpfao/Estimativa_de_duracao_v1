@@ -92,10 +92,29 @@ if uploaded_file is not None:
 
                     # Aplicar filtro e exibir os dados
                     df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=avancado, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
-                    
+                    df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
+                    df_outliers = df_filtered[df_filtered['Outlier'] == True]
+
                     # Remover colunas indesejadas
                     columns_to_drop = ['depth_range_start', 'depth_range_end', 'Tipo_avanço', 'Extensão']
                     df_filtered.drop(columns=columns_to_drop, inplace=True, errors='ignore')
+
+                    # Exibir a quantidade de amostras sem e com outliers
+                    st.markdown(
+                        f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
+                        f"Quantidade de Amostras sem Outliers (Linha {i + 1}, {avancado}): <strong>{df_non_outliers.shape[0]}</strong>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                    st.dataframe(df_non_outliers.reset_index(drop=True))
+
+                    st.markdown(
+                        f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
+                        f"Quantidade de Amostras com Outliers (Linha {i + 1}, {avancado}): <strong>{df_outliers.shape[0]}</strong>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+                    st.dataframe(df_outliers.reset_index(drop=True))
 
                     # Exibir o gráfico correspondente para cada grupo
                     if avancado == "Com avanço" and not df_filtered.empty:
@@ -106,11 +125,9 @@ if uploaded_file is not None:
                         plot_boxplot_with_labels(df_filtered, 'Tempo em horas', df_filtered['LIM_INF_OUT'].min(), df_filtered['LIM_SUP_OUT'].max(),
                                                  f'Boxplot de Tempo em horas - Linha {i + 1}, Grupo Sem avanço')
 
-                    # Exibir as amostras filtradas
-                    st.dataframe(df_filtered.reset_index(drop=True))
-
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
 
 else:
     st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
+

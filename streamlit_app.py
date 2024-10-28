@@ -26,98 +26,45 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     
     return df_filtered
 
+# Função para gerar o boxplot com Plotly, removendo o nome da coluna dos rótulos
 def plot_boxplot_with_plotly(df, column, lim_inf, lim_sup, title):
+    # Calcular as estatísticas para o boxplot
+    data = df[column].dropna()
+    median = data.median()
+    q1 = data.quantile(0.25)
+    q3 = data.quantile(0.75)
+    min_val = data.min()
+    max_val = data.max()
+    
+    # Criar a figura do boxplot
     fig = go.Figure()
 
-    # Adicionando o boxplot
+    # Adicionar o boxplot
     fig.add_trace(go.Box(
-        y=df[column],
-        boxpoints='all',  # Mostra todos os pontos
-        jitter=0.3,       # Adiciona dispersão aos pontos para melhor visualização
-        pointpos=-1.8,    # Posição dos pontos em relação ao boxplot
-        marker=dict(color='lightblue'),
-        line=dict(color='gray'),
-        fillcolor='rgba(173, 216, 230, 0.6)',
-        name=column,
-        hovertemplate='%{y:.1f}'  # Formatação do rótulo para uma casa decimal
+        x=data,
+        boxmean='sd',
+        orientation='h',
+        marker=dict(color='lightblue', opacity=0.6),
+        line=dict(width=1),
+        name=title,
+        hovertemplate='Valor: %{x:.1f}'  # Removendo o nome da coluna
     ))
 
-    # Adicionando linha da mediana
-    median_value = df[column].median()
-    fig.add_shape(
-        dict(
-            type="line",
-            x0=0,
-            y0=median_value,
-            x1=1,
-            y1=median_value,
-            xref="paper",
-            yref="y",
-            line=dict(color="green", width=2, dash="dash"),
-        )
-    )
-    fig.add_annotation(
-        x=1, y=median_value,
-        text=f"Mediana: {median_value:.1f}",
-        showarrow=False,
-        xref="paper",
-        yref="y",
-        font=dict(color="green")
-    )
-
-    # Adicionando linhas dos limites inferior e superior
-    fig.add_shape(
-        dict(
-            type="line",
-            x0=0,
-            y0=lim_inf,
-            x1=1,
-            y1=lim_inf,
-            xref="paper",
-            yref="y",
-            line=dict(color="blue", width=2, dash="dash"),
-        )
-    )
-    fig.add_annotation(
-        x=1, y=lim_inf,
-        text=f"Limite Inferior: {lim_inf:.1f}",
-        showarrow=False,
-        xref="paper",
-        yref="y",
-        font=dict(color="blue")
-    )
-
-    fig.add_shape(
-        dict(
-            type="line",
-            x0=0,
-            y0=lim_sup,
-            x1=1,
-            y1=lim_sup,
-            xref="paper",
-            yref="y",
-            line=dict(color="orange", width=2, dash="dash"),
-        )
-    )
-    fig.add_annotation(
-        x=1, y=lim_sup,
-        text=f"Limite Superior: {lim_sup:.1f}",
-        showarrow=False,
-        xref="paper",
-        yref="y",
-        font=dict(color="orange")
-    )
+    # Adicionar as linhas de limite
+    fig.add_shape(type='line', x0=lim_inf, y0=0, x1=lim_inf, y1=1, line=dict(color='blue', dash='dash'), xref='x', yref='paper', name='Limite Inferior')
+    fig.add_shape(type='line', x0=lim_sup, y0=0, x1=lim_sup, y1=1, line=dict(color='orange', dash='dash'), xref='x', yref='paper', name='Limite Superior')
+    fig.add_shape(type='line', x0=median, y0=0, x1=median, y1=1, line=dict(color='green', dash='dash'), xref='x', yref='paper', name='Mediana')
 
     # Configurações do layout
     fig.update_layout(
         title=title,
-        yaxis_title=column,
-        xaxis_title="",
-        showlegend=False,
-        height=300,  # Diminuindo a altura do gráfico para deixá-lo menor
+        xaxis_title='',
+        yaxis_title='',
+        showlegend=True,
+        legend=dict(x=0.75, y=1),
     )
 
-    # Exibir o gráfico no Streamlit
+    # Mostrar o gráfico
     st.plotly_chart(fig, use_container_width=True)
 
 # Definir a largura da página como ampla
@@ -217,10 +164,17 @@ if uploaded_file is not None:
 
                     # Aplicar filtro e exibir os dados
                     df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=avancado, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
-                    df_filtered = df_filtered.drop(columns=['depth_range_start', 'depth_range_end', 'Tipo_avanço', 'Extensão'], errors='ignore')
-
                     df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
                     df_outliers = df_filtered[df_filtered['Outlier'] == True]
+
+                    # Exibir gráficos de boxplot se houver dados filtrados
+                    if not df_filtered.empty:
+                        if avancado == "Com avanço":
+                            # Plotar boxplot para "Com avanço"
+                            plot_boxplot_with_plotly(df_non_outliers, 'Taxa', lim_inf=df_non_outliers['LIM_INF_OUT'].iloc[0], lim_sup=df_non_outliers['LIM_SUP_OUT'].iloc[0], title=f'Boxplot de Taxa - Linha {i + 1}, Grupo {avancado}')
+                        else:
+                            # Plotar boxplot para "Sem avanço"
+                            plot_boxplot_with_plotly(df_non_outliers, 'TEMPO_TOTAL_HORAS', lim_inf=df_non_outliers['LIM_INF_OUT'].iloc[0], lim_sup=df_non_outliers['LIM_SUP_OUT'].iloc[0], title=f'Boxplot de Tempo em horas - Linha {i + 1}, Grupo {avancado}')
 
                     # Exibir a quantidade de amostras sem e com outliers
                     st.markdown(
@@ -238,24 +192,6 @@ if uploaded_file is not None:
                         unsafe_allow_html=True
                     )
                     st.dataframe(df_outliers.reset_index(drop=True))
-
-                    # Gerar boxplot com os dados filtrados
-                    if avancado == "Com avanço" and not df_non_outliers.empty:
-                        plot_boxplot_with_plotly(
-                            df=df_non_outliers,
-                            column="Taxa",
-                            lim_inf=df_non_outliers["LIM_INF_OUT"].median(),
-                            lim_sup=df_non_outliers["LIM_SUP_OUT"].median(),
-                            title=f"Boxplot de Taxa - Linha {i + 1}, Grupo {avancado}"
-                        )
-                    elif avancado == "Sem avanço" and not df_non_outliers.empty:
-                        plot_boxplot_with_plotly(
-                            df=df_non_outliers,
-                            column="TEMPO_TOTAL_HORAS",
-                            lim_inf=df_non_outliers["LIM_INF_OUT"].median(),
-                            lim_sup=df_non_outliers["LIM_SUP_OUT"].median(),
-                            title=f"Boxplot de Tempo em horas - Linha {i + 1}, Grupo {avancado}"
-                        )
 
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")

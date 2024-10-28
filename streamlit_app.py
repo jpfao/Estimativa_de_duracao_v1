@@ -54,6 +54,13 @@ if uploaded_file is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
+            # Ajustar o DataFrame para usar apenas as colunas relevantes
+            df_reference_ajustado = df_reference[['FASE', 'ATIVIDADE', 'OPERACAO', 'ETAPA', 'Tipo_sonda']].copy()
+
+            # Transformar os campos em string, garantindo consistência
+            for col in df_reference_ajustado.columns:
+                df_reference_ajustado[col] = df_reference_ajustado[col].astype(str)
+
             for i, row in df_reference_ajustado.iterrows():
                 st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
             
@@ -92,9 +99,8 @@ if uploaded_file is not None:
                     if tipo_sonda == 'Todos':
                         tipo_sonda = None
 
-
                 # Aplicar filtro e exibir os dados
-                df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
+                df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, tipo_sonda=tipo_sonda)
                 df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
                 df_outliers = df_filtered[df_filtered['Outlier'] == True]
 

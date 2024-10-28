@@ -26,6 +26,19 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     
     return df_filtered
 
+# Função para obter os valores de uma linha específica
+def obter_valores_linha(df, linha_numero):
+    linha = df[df['Linha'] == linha_numero]
+    if linha.empty:
+        return None
+    return {
+        'FASE': linha['FASE'].values[0],
+        'ATIVIDADE': linha['ATIVIDADE'].values[0],
+        'OPERACAO': linha['OPERACAO'].values[0],
+        'ETAPA': linha['ETAPA'].values[0],
+        'Tipo_sonda': linha['Tipo_sonda'].values[0]
+    }
+
 # Configurar a página para exibição ampla
 st.set_page_config(layout="wide")
 
@@ -54,49 +67,47 @@ if uploaded_file is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
-            # Ajustar o DataFrame para usar apenas as colunas relevantes
-            df_reference_ajustado = df_reference[['FASE', 'ATIVIDADE', 'OPERACAO', 'ETAPA', 'Tipo_sonda']].copy()
+            # Garantir que as colunas do DataFrame de referência sejam strings
+            for col in ['FASE', 'ATIVIDADE', 'OPERACAO', 'ETAPA', 'Tipo_sonda']:
+                df_reference[col] = df_reference[col].astype(str)
 
-            # Transformar os campos em string, garantindo consistência
-            for col in df_reference_ajustado.columns:
-                df_reference_ajustado[col] = df_reference_ajustado[col].astype(str)
-
-            for i, row in df_reference_ajustado.iterrows():
-                st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
-            
-                # Obter valores de filtro para cada coluna
-                fase = row.get('FASE') if row.get('FASE') != "TODOS" else None
-                atividade = row.get('ATIVIDADE') if row.get('ATIVIDADE') != "TODOS" else None
-                operacao = row.get('OPERACAO') if row.get('OPERACAO') != "TODOS" else None
-                etapa = row.get('ETAPA') if row.get('ETAPA') != "TODOS" else None
-                tipo_sonda = [row.get('Tipo_sonda')] if row.get('Tipo_sonda') != "TODOS" else None
-            
-                # Renderizar campos com valores disponíveis no arquivo de referência
+            # Iterar sobre as linhas do DataFrame de referência
+            for i in range(1, len(df_reference) + 1):
+                st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i}</div>", unsafe_allow_html=True)
+                
+                # Obter os valores para a linha atual
+                valores = obter_valores_linha(df_reference, i)
+                
+                if valores is None:
+                    st.warning(f"Linha {i} não encontrada no arquivo de referência.")
+                    continue
+                
+                # Renderizar campos com valores obtidos do arquivo de referência
                 col1, col2, col3, col4, col5 = st.columns(5)
             
                 with col1:
-                    fase = st.selectbox(f'FASE (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['FASE'].unique().tolist()), index=(df_reference_ajustado['FASE'].unique().tolist().index(fase) + 1) if fase else 0)
+                    fase = st.selectbox(f'FASE (Linha {i}):', sorted(['Todos'] + df_reference['FASE'].unique().tolist()), index=(df_reference['FASE'].unique().tolist().index(valores['FASE']) + 1) if valores['FASE'] else 0)
                     if fase == 'Todos':
                         fase = None
             
                 with col2:
-                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['ATIVIDADE'].unique().tolist()), index=(df_reference_ajustado['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade else 0)
+                    atividade = st.selectbox(f'ATIVIDADE (Linha {i}):', sorted(['Todos'] + df_reference['ATIVIDADE'].unique().tolist()), index=(df_reference['ATIVIDADE'].unique().tolist().index(valores['ATIVIDADE']) + 1) if valores['ATIVIDADE'] else 0)
                     if atividade == 'Todos':
                         atividade = None
             
                 with col3:
-                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['OPERACAO'].unique().tolist()), index=(df_reference_ajustado['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao else 0)
+                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i}):', sorted(['Todos'] + df_reference['OPERACAO'].unique().tolist()), index=(df_reference['OPERACAO'].unique().tolist().index(valores['OPERACAO']) + 1) if valores['OPERACAO'] else 0)
                     if operacao == 'Todos':
                         operacao = None
             
                 with col4:
-                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['ETAPA'].unique().tolist()), index=(df_reference_ajustado['ETAPA'].unique().tolist().index(etapa) + 1) if etapa else 0)
+                    etapa = st.selectbox(f'ETAPA (Linha {i}):', sorted(['Todos'] + df_reference['ETAPA'].unique().tolist()), index=(df_reference['ETAPA'].unique().tolist().index(valores['ETAPA']) + 1) if valores['ETAPA'] else 0)
                     if etapa == 'Todos':
                         etapa = None
             
                 with col5:
-                    tipo_sonda = st.selectbox(f'TIPO SONDA (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['Tipo_sonda'].unique().tolist()), index=(df_reference_ajustado['Tipo_sonda'].unique().tolist().index(tipo_sonda[0]) + 1) if tipo_sonda else 0)
-                    if 'Todos' in tipo_sonda:
+                    tipo_sonda = st.selectbox(f'TIPO SONDA (Linha {i}):', sorted(['Todos'] + df_reference['Tipo_sonda'].unique().tolist()), index=(df_reference['Tipo_sonda'].unique().tolist().index(valores['Tipo_sonda']) + 1) if valores['Tipo_sonda'] else 0)
+                    if tipo_sonda == 'Todos':
                         tipo_sonda = None
 
                 # Aplicar filtro e exibir os dados
@@ -107,7 +118,7 @@ if uploaded_file is not None:
                 # Exibir a quantidade de amostras sem e com outliers
                 st.markdown(
                     f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
-                    f"Quantidade de Amostras sem Outliers (Linha {i + 1}): <strong>{df_non_outliers.shape[0]}</strong>"
+                    f"Quantidade de Amostras sem Outliers (Linha {i}): <strong>{df_non_outliers.shape[0]}</strong>"
                     f"</div>",
                     unsafe_allow_html=True
                 )
@@ -115,7 +126,7 @@ if uploaded_file is not None:
 
                 st.markdown(
                     f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
-                    f"Quantidade de Amostras com Outliers (Linha {i + 1}): <strong>{df_outliers.shape[0]}</strong>"
+                    f"Quantidade de Amostras com Outliers (Linha {i}): <strong>{df_outliers.shape[0]}</strong>"
                     f"</div>",
                     unsafe_allow_html=True
                 )

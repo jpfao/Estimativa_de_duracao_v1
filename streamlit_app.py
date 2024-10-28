@@ -135,4 +135,10 @@ if uploaded_file is not None:
                     f"</div>",
                     unsafe_allow_html=True
                 )
-                st.dataframe
+                st.dataframe(df_outliers.reset_index(drop=True))
+
+    except Exception as e:
+        st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
+
+else:
+    st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")

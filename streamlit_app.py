@@ -138,7 +138,7 @@ if uploaded_file is not None:
 
                     with col7:
                         revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}, {avancado}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
-                        if 'Todos' in revestimento
+                        if 'Todos' in revestimento:
                             revestimento = None
 
                     with col8:

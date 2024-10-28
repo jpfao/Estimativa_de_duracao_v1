@@ -54,66 +54,44 @@ if uploaded_file is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
-            for i, row in df_reference.iterrows():
-                st.markdown(
-                    f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", 
-                    unsafe_allow_html=True
-                )
-
-                # Obter valores de filtro da linha do arquivo de referência
+            for i, row in df_reference_ajustado.iterrows():
+                st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
+            
+                # Obter valores de filtro para cada coluna
+                fase = row.get('FASE') if row.get('FASE') != "TODOS" else None
                 atividade = row.get('ATIVIDADE') if row.get('ATIVIDADE') != "TODOS" else None
                 operacao = row.get('OPERACAO') if row.get('OPERACAO') != "TODOS" else None
                 etapa = row.get('ETAPA') if row.get('ETAPA') != "TODOS" else None
-                fase = row.get('FASE') if row.get('FASE') != "TODOS" else None
-                obz = row.get('Obz') if row.get('Obz') != "TODOS" else None
-                broca = [row.get('Diâmetro Broca')] if pd.notna(row.get('Diâmetro Broca')) and row.get('Diâmetro Broca') != "TODOS" else None
-                revestimento = [row.get('Diâmetro Revestimento')] if pd.notna(row.get('Diâmetro Revestimento')) and row.get('Diâmetro Revestimento') != "TODOS" else None
-                tipo_sonda = [row.get('Tipo_sonda')] if pd.notna(row.get('Tipo_sonda')) and row.get('Tipo_sonda') != "TODOS" else None
-
-                # Renderizar campos com valores pré-preenchidos do arquivo de referência
-                col1, col2, col3, col4 = st.columns(4)
-
+                tipo_sonda = row.get('Tipo_sonda') if row.get('Tipo_sonda') != "TODOS" else None
+            
+                # Renderizar campos com valores disponíveis no arquivo de referência
+                col1, col2, col3, col4, col5 = st.columns(5)
+            
                 with col1:
-                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', sorted(['Todos'] + df['ATIVIDADE'].unique().tolist()), index=(df['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade else 0)
-                    if atividade == 'Todos':
-                        atividade = None
-
-                with col2:
-                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', sorted(['Todos'] + df['OPERACAO'].unique().tolist()), index=(df['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao else 0)
-                    if operacao == 'Todos':
-                        operacao = None
-
-                with col3:
-                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', sorted(['Todos'] + df['ETAPA'].unique().tolist()), index=(df['ETAPA'].unique().tolist().index(etapa) + 1) if etapa else 0)
-                    if etapa == 'Todos':
-                        etapa = None
-
-                with col4:
-                    fase = st.selectbox(f'FASE (Linha {i + 1}):', sorted(['Todos'] + df['FASE'].unique().tolist()), index=(df['FASE'].unique().tolist().index(fase) + 1) if fase else 0)
+                    fase = st.selectbox(f'FASE (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['FASE'].unique().tolist()), index=(df_reference_ajustado['FASE'].unique().tolist().index(fase) + 1) if fase else 0)
                     if fase == 'Todos':
                         fase = None
-
-                col5, col6, col7, col8 = st.columns(4)
-
+            
+                with col2:
+                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['ATIVIDADE'].unique().tolist()), index=(df_reference_ajustado['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade else 0)
+                    if atividade == 'Todos':
+                        atividade = None
+            
+                with col3:
+                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['OPERACAO'].unique().tolist()), index=(df_reference_ajustado['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao else 0)
+                    if operacao == 'Todos':
+                        operacao = None
+            
+                with col4:
+                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['ETAPA'].unique().tolist()), index=(df_reference_ajustado['ETAPA'].unique().tolist().index(etapa) + 1) if etapa else 0)
+                    if etapa == 'Todos':
+                        etapa = None
+            
                 with col5:
-                    obz = st.selectbox(f'OBZ (Linha {i + 1}):', sorted(['Todos'] + df['Obz'].unique().tolist()), index=(df['Obz'].unique().tolist().index(obz) + 1) if obz else 0)
-                    if obz == 'Todos':
-                        obz = None
-
-                with col6:
-                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha {i + 1}):', sorted(['Todos'] + df['Diâmetro Broca'].dropna().unique().tolist()), default=broca or 'Todos')
-                    if 'Todos' in broca:
-                        broca = None
-
-                with col7:
-                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}):', sorted(['Todos'] + df['Diâmetro Revestimento'].dropna().unique().tolist()), default=revestimento or 'Todos')
-                    if 'Todos' in revestimento:
-                        revestimento = None
-
-                with col8:
-                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}):', sorted(['Todos'] + df['Tipo_sonda'].unique().tolist()), default=tipo_sonda or 'Todos')
-                    if 'Todos' in tipo_sonda:
+                    tipo_sonda = st.selectbox(f'TIPO SONDA (Linha {i + 1}):', sorted(['Todos'] + df_reference_ajustado['Tipo_sonda'].unique().tolist()), index=(df_reference_ajustado['Tipo_sonda'].unique().tolist().index(tipo_sonda) + 1) if tipo_sonda else 0)
+                    if tipo_sonda == 'Todos':
                         tipo_sonda = None
+
 
                 # Aplicar filtro e exibir os dados
                 df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)

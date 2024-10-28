@@ -34,12 +34,10 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
-
 if uploaded_file is not None:
     try:
         # Carregar o arquivo principal
         df = pd.read_excel(uploaded_file)
-        
         
         for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda', 'Diâmetro Broca', 'Diâmetro Revestimento']:  # Colunas que devem ser strings
             df[col] = df[col].astype(str)  # Garante que essas colunas sejam do tipo string
@@ -54,7 +52,6 @@ if uploaded_file is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
- ################################################################################################################           
             for i, row in df_reference.iterrows():
                 st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
 
@@ -134,10 +131,8 @@ if uploaded_file is not None:
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
 
-
-
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
 
 else:
-    st.warning("Nenhum arquivo foi carregado.")
+    st.warning

@@ -1,53 +1,31 @@
 import streamlit as st
 import pandas as pd
 
-# Função para filtrar as opções e remover outliers, com mensagens de depuração
+# Função para filtrar as opções e remover outliers
 @st.cache_data
 def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None, broca=None, revestimento=None, tipo_sonda=None):
     df_filtered = df.copy()  # Trabalhar com cópia para evitar alterações no original
     
-    # Aplicar filtros apenas se o valor for diferente de "TODOS" e não for None
     if atividade and atividade != "TODOS":
         df_filtered = df_filtered[df_filtered['ATIVIDADE'] == atividade]
-        st.write(f"Filtrado por ATIVIDADE: {atividade}, {df_filtered.shape[0]} registros encontrados.")
     if operacao and operacao != "TODOS":
         df_filtered = df_filtered[df_filtered['OPERACAO'] == operacao]
-        st.write(f"Filtrado por OPERACAO: {operacao}, {df_filtered.shape[0]} registros encontrados.")
     if etapa and etapa != "TODOS":
         df_filtered = df_filtered[df_filtered['ETAPA'] == etapa]
-        st.write(f"Filtrado por ETAPA: {etapa}, {df_filtered.shape[0]} registros encontrados.")
     if fase and fase != "TODOS":
         df_filtered = df_filtered[df_filtered['FASE'] == fase]
-        st.write(f"Filtrado por FASE: {fase}, {df_filtered.shape[0]} registros encontrados.")
     if obz and obz != "TODOS":
         df_filtered = df_filtered[df_filtered['Obz'] == obz]
-        st.write(f"Filtrado por OBZ: {obz}, {df_filtered.shape[0]} registros encontrados.")
-    if broca and isinstance(broca, list) and 'TODOS' not in broca:
+    if broca and 'TODOS' not in broca:
         df_filtered = df_filtered[df_filtered['Diâmetro Broca'].isin(broca)]
-        st.write(f"Filtrado por Diâmetro Broca: {broca}, {df_filtered.shape[0]} registros encontrados.")
-    if revestimento and isinstance(revestimento, list) and 'TODOS' not in revestimento:
+    if revestimento and 'TODOS' not in revestimento:
         df_filtered = df_filtered[df_filtered['Diâmetro Revestimento'].isin(revestimento)]
-        st.write(f"Filtrado por Diâmetro Revestimento: {revestimento}, {df_filtered.shape[0]} registros encontrados.")
-    if tipo_sonda and isinstance(tipo_sonda, list) and 'TODOS' not in tipo_sonda:
+    if tipo_sonda and 'TODOS' not in tipo_sonda:
         df_filtered = df_filtered[df_filtered['Tipo_sonda'].isin(tipo_sonda)]
-        st.write(f"Filtrado por Tipo_sonda: {tipo_sonda}, {df_filtered.shape[0]} registros encontrados.")
     
     return df_filtered
 
-# Função para obter os valores de uma linha específica
-def obter_valores_linha(df, linha_numero):
-    linha = df[df['Linha'] == linha_numero]
-    if linha.empty:
-        return None
-    return {
-        'FASE': linha['FASE'].values[0],
-        'ATIVIDADE': linha['ATIVIDADE'].values[0],
-        'OPERACAO': linha['OPERACAO'].values[0],
-        'ETAPA': linha['ETAPA'].values[0],
-        'Tipo_sonda': linha['Tipo_sonda'].values[0]
-    }
-
-# Configurar a página para exibição ampla
+# Definir a largura da página como ampla
 st.set_page_config(layout="wide")
 
 # Upload do arquivo principal
@@ -56,93 +34,118 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
+
 if uploaded_file is not None:
     try:
         # Carregar o arquivo principal
         df = pd.read_excel(uploaded_file)
         
-        # Garantir que as colunas sejam do tipo string
-        for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda', 'Diâmetro Broca', 'Diâmetro Revestimento']:
-            df[col] = df[col].astype(str)
-        
-        # Exibir informações sobre o arquivo carregado
+        # Exibir o número de linhas e colunas do arquivo principal
         st.success(f"Arquivo principal carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
         
-        st.title('Seleção de amostras para Simulação da Estimativa de duração de Poço')
+        st.title('Formulário Interativo para Sequência Operacional')
 
-        # Carregar o arquivo de referência, se disponível
+        # Carregar e exibir linhas do arquivo de referência
         if uploaded_reference is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
-            # Garantir que as colunas do DataFrame de referência sejam strings
-            for col in ['FASE', 'ATIVIDADE', 'OPERACAO', 'ETAPA', 'Tipo_sonda']:
-                df_reference[col] = df_reference[col].astype(str)
+            for i, row in df_reference.iterrows():
+                st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
 
-            # Iterar sobre as linhas do DataFrame de referência
-            for i in range(1, len(df_reference) + 1):
-                st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i}</div>", unsafe_allow_html=True)
+                # Obter valores de filtro da linha do arquivo de referência
+                atividade = row.get('ATIVIDADE')
+                operacao = row.get('OPERACAO')
+                etapa = row.get('ETAPA')
+                fase = row.get('FASE')
+                obz = row.get('Obz')
+                broca = [row.get('Diâmetro Broca')] if pd.notna(row.get('Diâmetro Broca')) else None
+                revestimento = [row.get('Diâmetro Revestimento')] if pd.notna(row.get('Diâmetro Revestimento')) else None
+                tipo_sonda = [row.get('Tipo_sonda')] if pd.notna(row.get('Tipo_sonda')) else None
                 
-                # Obter os valores para a linha atual
-                valores = obter_valores_linha(df_reference, i)
+                # Renderizar campos com valores pré-preenchidos do arquivo de referência
+                col1, col2, col3, col4 = st.columns(4)
                 
-                if valores is None:
-                    st.warning(f"Linha {i} não encontrada no arquivo de referência.")
-                    continue
-                
-                # Renderizar campos com valores obtidos do arquivo de referência
-                col1, col2, col3, col4, col5 = st.columns(5)
-            
                 with col1:
-                    fase = st.selectbox(f'FASE (Linha {i}):', sorted(['Todos'] + df_reference['FASE'].unique().tolist()), index=(df_reference['FASE'].unique().tolist().index(valores['FASE']) + 1) if valores['FASE'] else 0)
-                    if fase == 'Todos':
-                        fase = None
-            
-                with col2:
-                    atividade = st.selectbox(f'ATIVIDADE (Linha {i}):', sorted(['Todos'] + df_reference['ATIVIDADE'].unique().tolist()), index=(df_reference['ATIVIDADE'].unique().tolist().index(valores['ATIVIDADE']) + 1) if valores['ATIVIDADE'] else 0)
+                    atividade = st.selectbox(f'ATIVIDADE (Linha {i + 1}):', ['Todos'] + df['ATIVIDADE'].unique().tolist(), 
+                                             index=(df['ATIVIDADE'].unique().tolist().index(atividade) + 1) if atividade and atividade in df['ATIVIDADE'].unique() else 0)
                     if atividade == 'Todos':
                         atividade = None
-            
-                with col3:
-                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i}):', sorted(['Todos'] + df_reference['OPERACAO'].unique().tolist()), index=(df_reference['OPERACAO'].unique().tolist().index(valores['OPERACAO']) + 1) if valores['OPERACAO'] else 0)
+                
+                with col2:
+                    operacao = st.selectbox(f'OPERAÇÃO (Linha {i + 1}):', ['Todos'] + df['OPERACAO'].unique().tolist(), 
+                                            index=(df['OPERACAO'].unique().tolist().index(operacao) + 1) if operacao and operacao in df['OPERACAO'].unique() else 0)
                     if operacao == 'Todos':
                         operacao = None
-            
-                with col4:
-                    etapa = st.selectbox(f'ETAPA (Linha {i}):', sorted(['Todos'] + df_reference['ETAPA'].unique().tolist()), index=(df_reference['ETAPA'].unique().tolist().index(valores['ETAPA']) + 1) if valores['ETAPA'] else 0)
+                
+                with col3:
+                    etapa = st.selectbox(f'ETAPA (Linha {i + 1}):', ['Todos'] + df['ETAPA'].unique().tolist(), 
+                                         index=(df['ETAPA'].unique().tolist().index(etapa) + 1) if etapa and etapa in df['ETAPA'].unique() else 0)
                     if etapa == 'Todos':
                         etapa = None
-            
+                
+                with col4:
+                    fase = st.selectbox(f'FASE (Linha {i + 1}):', ['Todos'] + df['FASE'].unique().tolist(), 
+                                        index=(df['FASE'].unique().tolist().index(fase) + 1) if fase and fase in df['FASE'].unique() else 0)
+                    if fase == 'Todos':
+                        fase = None
+                
+                col5, col6, col7, col8 = st.columns(4)
+                
                 with col5:
-                    tipo_sonda = st.selectbox(f'TIPO SONDA (Linha {i}):', sorted(['Todos'] + df_reference['Tipo_sonda'].unique().tolist()), index=(df_reference['Tipo_sonda'].unique().tolist().index(valores['Tipo_sonda']) + 1) if valores['Tipo_sonda'] else 0)
-                    if tipo_sonda == 'Todos':
+                    obz = st.selectbox(f'OBZ (Linha {i + 1}):', ['Todos'] + df['Obz'].unique().tolist(), 
+                                       index=(df['Obz'].unique().tolist().index(obz) + 1) if obz and obz in df['Obz'].unique() else 0)
+                    if obz == 'Todos':
+                        obz = None
+                
+                with col6:
+                    broca = st.multiselect(f'DIÂMETRO BROCA (Linha {i + 1}):', ['Todos'] + df['Diâmetro Broca'].unique().tolist(), default=broca or ['Todos'])
+                    if 'Todos' in broca:
+                        broca = None
+                
+                with col7:
+                    revestimento = st.multiselect(f'DIÂMETRO REVESTIMENTO (Linha {i + 1}):', ['Todos'] + df['Diâmetro Revestimento'].unique().tolist(), default=revestimento or ['Todos'])
+                    if 'Todos' in revestimento:
+                        revestimento = None
+                
+                with col8:
+                    tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}):', ['Todos'] + df['Tipo_sonda'].unique().tolist(), default=tipo_sonda or ['Todos'])
+                    if 'Todos' in tipo_sonda:
                         tipo_sonda = None
-
+                
                 # Aplicar filtro e exibir os dados
-                df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, tipo_sonda=tipo_sonda)
+                df_filtered = filter_options(df, atividade=atividade, operacao=operacao, etapa=etapa, fase=fase, obz=obz, broca=broca, revestimento=revestimento, tipo_sonda=tipo_sonda)
                 df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
                 df_outliers = df_filtered[df_filtered['Outlier'] == True]
-
-                # Exibir a quantidade de amostras sem e com outliers
+                
                 st.markdown(
                     f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
-                    f"Quantidade de Amostras sem Outliers (Linha {i}): <strong>{df_non_outliers.shape[0]}</strong>"
+                    f"Quantidade de Amostras sem Outliers (Linha {i + 1}): <strong>{df_non_outliers.shape[0]}</strong>"
                     f"</div>",
                     unsafe_allow_html=True
                 )
                 st.dataframe(df_non_outliers.reset_index(drop=True))
-
+                
                 st.markdown(
                     f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
-                    f"Quantidade de Amostras com Outliers (Linha {i}): <strong>{df_outliers.shape[0]}</strong>"
-                                        f"</div>",
+                    f"Quantidade de Amostras com Outliers (Linha {i + 1}): <strong>{df_outliers.shape[0]}</strong>"
+                    f"</div>",
                     unsafe_allow_html=True
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
+
+                # Botão para incluir linha manual abaixo da linha automática atual
+                if st.button(f"Incluir linha abaixo da Linha {i + 1}"):
+                    add_manual_row(i + 1)
 
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
 
 else:
-    st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
+    st.warning("Nenhum arquivo foi carregado.")
+
+
+
+
+               
 

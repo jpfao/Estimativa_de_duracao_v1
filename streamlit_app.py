@@ -34,11 +34,14 @@ uploaded_file = st.file_uploader("Upload do arquivo planilhão sumarizado", type
 # Upload do arquivo de referência
 uploaded_reference = st.file_uploader("Upload do arquivo de referência para a SEQOP", type="xlsx")
 
-
 if uploaded_file is not None:
     try:
         # Carregar o arquivo principal
         df = pd.read_excel(uploaded_file)
+        
+        # Converter as colunas para o tipo string
+        for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda', 'Diâmetro Broca', 'Diâmetro Revestimento']:
+            df[col] = df[col].astype(str)
         
         # Exibir o número de linhas e colunas do arquivo principal
         st.success(f"Arquivo principal carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
@@ -50,6 +53,7 @@ if uploaded_file is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
+            # Iterar sobre as linhas do DataFrame de referência
             for i, row in df_reference.iterrows():
                 st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
 
@@ -57,7 +61,7 @@ if uploaded_file is not None:
                 atividade = row.get('ATIVIDADE')
                 operacao = row.get('OPERACAO')
                 etapa = row.get('ETAPA')
-                fase = row.get('FASE')
+                fase = str(row.get('FASE'))  # Converter para string para garantir a compatibilidade
                 obz = row.get('Obz')
                 broca = [row.get('Diâmetro Broca')] if pd.notna(row.get('Diâmetro Broca')) else None
                 revestimento = [row.get('Diâmetro Revestimento')] if pd.notna(row.get('Diâmetro Revestimento')) else None
@@ -134,18 +138,9 @@ if uploaded_file is not None:
                 )
                 st.dataframe(df_outliers.reset_index(drop=True))
 
-                # Botão para incluir linha manual abaixo da linha automática atual
-                if st.button(f"Incluir linha abaixo da Linha {i + 1}"):
-                    add_manual_row(i + 1)
-
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
 
 else:
-    st.warning("Nenhum arquivo foi carregado.")
-
-
-
-
-               
+    st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
 

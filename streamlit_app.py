@@ -33,7 +33,7 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
 
 # Função para gerar o boxplot com rótulos, com tamanho reduzido
 def plot_boxplot_with_labels(data, column, lim_inf, lim_sup, title):
-    plt.figure(figsize=(4, 2))  # Reduzir o tamanho do gráfico para metade
+    plt.figure(figsize=(3, 1.5))  # Reduzir ainda mais o tamanho do gráfico
     sns.boxplot(x=data[column], color='lightblue', flierprops={'marker': 'o', 'color': 'red'})
     median_value = data[column].median()
     
@@ -42,11 +42,11 @@ def plot_boxplot_with_labels(data, column, lim_inf, lim_sup, title):
     plt.axvline(lim_inf, color='blue', linestyle='--', label=f'Limite Inferior: {lim_inf:.2f}')
     plt.axvline(lim_sup, color='orange', linestyle='--', label=f'Limite Superior: {lim_sup:.2f}')
     
-    plt.title(title, fontsize=10)  # Ajustar o tamanho da fonte do título
-    plt.xlabel(column, fontsize=8)  # Ajustar o tamanho da fonte do rótulo
-    plt.xticks(fontsize=7)  # Ajustar o tamanho da fonte dos ticks
-    plt.yticks(fontsize=7)
-    plt.legend(fontsize=6)  # Ajustar o tamanho da fonte da legenda
+    plt.title(title, fontsize=8)  # Ajustar o tamanho da fonte do título
+    plt.xlabel(column, fontsize=6)  # Ajustar o tamanho da fonte do rótulo
+    plt.xticks(fontsize=5)  # Ajustar o tamanho da fonte dos ticks
+    plt.yticks(fontsize=5)
+    plt.legend(fontsize=5)  # Ajustar o tamanho da fonte da legenda
     plt.grid()
     st.pyplot(plt.gcf())  # Mostrar o gráfico no Streamlit
     plt.close()
@@ -182,5 +182,4 @@ if uploaded_file is not None:
 
 else:
     st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
-
 

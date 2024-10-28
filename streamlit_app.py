@@ -141,7 +141,6 @@ if uploaded_file is not None:
 
                     with col8:
                         tipo_sonda = st.multiselect(f'TIPO SONDA (Linha {i + 1}, {avancado}):', ['Todos'] + df['Tipo_sonda'].unique().tolist(), default=tipo_sonda or ['Todos'])
-                        if 'Todos' in
                         if 'Todos' in tipo_sonda:
                             tipo_sonda = None
 

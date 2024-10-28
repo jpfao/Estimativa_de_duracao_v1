@@ -34,6 +34,19 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     
     return df_filtered
 
+# Função para obter os valores de uma linha específica
+def obter_valores_linha(df, linha_numero):
+    linha = df[df['Linha'] == linha_numero]
+    if linha.empty:
+        return None
+    return {
+        'FASE': linha['FASE'].values[0],
+        'ATIVIDADE': linha['ATIVIDADE'].values[0],
+        'OPERACAO': linha['OPERACAO'].values[0],
+        'ETAPA': linha['ETAPA'].values[0],
+        'Tipo_sonda': linha['Tipo_sonda'].values[0]
+    }
+
 # Configurar a página para exibição ampla
 st.set_page_config(layout="wide")
 
@@ -122,14 +135,5 @@ if uploaded_file is not None:
                 st.markdown(
                     f"<div style='background-color: #FFE8E8; padding: 10px; border-radius: 5px; margin: 20px 0 10px 0; color: #8B0000; font-size: 18px; text-align: center;'>"
                     f"Quantidade de Amostras com Outliers (Linha {i}): <strong>{df_outliers.shape[0]}</strong>"
-                                        f"</div>",
-                    unsafe_allow_html=True
-                )
-                st.dataframe(df_outliers.reset_index(drop=True))
-
-    except Exception as e:
-        st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
-
-else:
-    st.warning("Nenhum arquivo foi carregado. Por favor, faça o upload dos arquivos necessários.")
-
+                    f"</div>",
+                    unsafe_allow

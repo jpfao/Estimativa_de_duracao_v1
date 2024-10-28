@@ -6,6 +6,7 @@ import pandas as pd
 def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz=None, broca=None, revestimento=None, tipo_sonda=None):
     df_filtered = df.copy()  # Trabalhar com cópia para evitar alterações no original
     
+    # Aplicar filtros apenas se o valor for diferente de "TODOS" e não for None
     if atividade and atividade != "TODOS":
         df_filtered = df_filtered[df_filtered['ATIVIDADE'] == atividade]
     if operacao and operacao != "TODOS":
@@ -25,7 +26,7 @@ def filter_options(df, atividade=None, operacao=None, etapa=None, fase=None, obz
     
     return df_filtered
 
-# Definir a largura da página como ampla
+# Configurar a página para exibição ampla
 st.set_page_config(layout="wide")
 
 # Upload do arquivo principal
@@ -39,23 +40,27 @@ if uploaded_file is not None:
         # Carregar o arquivo principal
         df = pd.read_excel(uploaded_file)
         
-        for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda', 'Diâmetro Broca', 'Diâmetro Revestimento']:  # Colunas que devem ser strings
-            df[col] = df[col].astype(str)  # Garante que essas colunas sejam do tipo string
+        # Garantir que as colunas sejam do tipo string
+        for col in ['ATIVIDADE', 'OPERACAO', 'ETAPA', 'FASE', 'Obz', 'Tipo_sonda', 'Diâmetro Broca', 'Diâmetro Revestimento']:
+            df[col] = df[col].astype(str)
         
-        # Exibir o número de linhas e colunas do arquivo principal
+        # Exibir informações sobre o arquivo carregado
         st.success(f"Arquivo principal carregado com sucesso! Tamanho: {df.shape[0]} linhas e {df.shape[1]} colunas.")
         
         st.title('Seleção de amostras para Simulação da Estimativa de duração de Poço')
 
-        # Carregar e exibir linhas do arquivo de referência
+        # Carregar o arquivo de referência, se disponível
         if uploaded_reference is not None:
             df_reference = pd.read_excel(uploaded_reference)
             st.success("Arquivo de referência carregado com sucesso!")
 
             for i, row in df_reference.iterrows():
-                st.markdown(f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", unsafe_allow_html=True)
+                st.markdown(
+                    f"<div style='background-color: #008542; padding: 1px; margin-bottom: 10px; color: white; text-align: center;'>Linha {i + 1}</div>", 
+                    unsafe_allow_html=True
+                )
 
-                # Obter valores de filtro da linha do arquivo de referência, mantendo colunas com valor "TODOS" sem filtro
+                # Obter valores de filtro da linha do arquivo de referência
                 atividade = row.get('ATIVIDADE') if row.get('ATIVIDADE') != "TODOS" else None
                 operacao = row.get('OPERACAO') if row.get('OPERACAO') != "TODOS" else None
                 etapa = row.get('ETAPA') if row.get('ETAPA') != "TODOS" else None
@@ -115,6 +120,7 @@ if uploaded_file is not None:
                 df_non_outliers = df_filtered[df_filtered['Outlier'] == False]
                 df_outliers = df_filtered[df_filtered['Outlier'] == True]
 
+                # Exibir a quantidade de amostras sem e com outliers
                 st.markdown(
                     f"<div style='background-color: #E8F4FF; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #00008B; font-size: 18px; text-align: center;'>"
                     f"Quantidade de Amostras sem Outliers (Linha {i + 1}): <strong>{df_non_outliers.shape[0]}</strong>"
@@ -129,10 +135,4 @@ if uploaded_file is not None:
                     f"</div>",
                     unsafe_allow_html=True
                 )
-                st.dataframe(df_outliers.reset_index(drop=True))
-
-    except Exception as e:
-        st.error(f"Ocorreu um erro ao carregar o arquivo: {e}")
-
-else:
-    st.warning
+                st.dataframe
